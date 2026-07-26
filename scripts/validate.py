@@ -55,10 +55,13 @@ class Validation:
 
     def validate_manifests(self) -> None:
         copilot = self.read_json("plugin.json")
+        vscode = self.read_json(".plugin/plugin.json")
         claude = self.read_json(".claude-plugin/plugin.json")
         marketplace = self.read_json(".claude-plugin/marketplace.json")
 
         for key in ("name", "description", "version", "repository", "license"):
+            if copilot.get(key) != vscode.get(key):
+                self.fail(f"Manifest field differs between Copilot and VS Code: {key}")
             if copilot.get(key) != claude.get(key):
                 self.fail(f"Manifest field differs between clients: {key}")
 
@@ -75,6 +78,10 @@ class Validation:
             self.fail("Copilot manifest must use copilot-agents/")
         if copilot.get("skills") != "skills/":
             self.fail("Copilot manifest must use skills/")
+        if vscode.get("agents") != "copilot-agents/":
+            self.fail("VS Code precedence manifest must use copilot-agents/")
+        if vscode.get("skills") != "skills/":
+            self.fail("VS Code precedence manifest must use skills/")
 
         if "agents" in claude:
             self.fail("Claude manifest must use default agents/ discovery")

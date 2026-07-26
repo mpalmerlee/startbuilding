@@ -37,8 +37,12 @@ project file.
 
 3. Open **Chat: Open Customizations** and confirm the `deliver` skill and five StartBuilding agents
    have no diagnostics.
-4. Confirm `/startbuilding:deliver` appears and the Coordinator can invoke each exact specialist.
-5. Disable the plugin and confirm its components disappear; enable it and confirm they return.
+4. Confirm the agent sources resolve through `copilot-agents/`, not the Claude-format `agents/`
+   directory.
+5. Invoke the Planner as a subagent and confirm it receives workspace read and file-search tools.
+6. Invoke the Implementer as a subagent and confirm it receives filesystem, edit, and shell tools.
+7. Confirm `/startbuilding:deliver` appears and the Coordinator can invoke each exact specialist.
+8. Disable the plugin and confirm its components disappear; enable it and confirm they return.
 
 ## Copilot CLI local test
 

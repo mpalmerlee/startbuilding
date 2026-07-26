@@ -2,6 +2,14 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.1.1 - 2026-07-26
+
+### Fixed
+
+- Added a higher-precedence VS Code manifest so direct source installations use the Copilot-native
+  agents instead of treating the colocated Claude marketplace as the plugin format.
+- Added delegated Planner and Implementer tool-availability checks to VS Code acceptance testing.
+
 ## 0.1.0 - 2026-07-26
 
 ### Added

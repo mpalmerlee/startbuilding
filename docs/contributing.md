@@ -40,7 +40,7 @@ installation, or delivery safety.
 For every release:
 
 1. Choose the semantic version.
-2. Update `plugin.json`, `.claude-plugin/plugin.json`, and
+2. Update `plugin.json`, `.plugin/plugin.json`, `.claude-plugin/plugin.json`, and
    `.claude-plugin/marketplace.json` together.
 3. Add a dated changelog entry.
 4. Run static and cross-client acceptance checks from a clean worktree.

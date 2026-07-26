@@ -13,6 +13,7 @@ system, remote execution service, or project-management UI.
 
 ```text
 plugin.json                         Copilot and VS Code manifest
+.plugin/plugin.json                 VS Code precedence manifest
 .claude-plugin/plugin.json          Claude Code manifest
 .claude-plugin/marketplace.json     Self-hosted Claude catalog
 skills/deliver/                     Shared workflow and artifact contract
@@ -21,10 +22,12 @@ agents/                             Claude-native agent definitions
 scripts/validate.sh                 Static validation entry point
 ```
 
-The manifests share the stable `startbuilding` identity and `skills/` tree. They select separate
-agent definitions because host-native tool names, visibility controls, and delegation allowlists
-differ. Specialist bodies remain identical so behavior does not drift while frontmatter preserves
-the strongest native restriction each host supports.
+The manifests share the stable `startbuilding` identity and `skills/` tree. The `.plugin` copy has
+higher VS Code precedence and prevents a colocated Claude marketplace catalog from causing a direct
+source installation to load Claude-format agents. The manifests select separate agent definitions
+because host-native tool names, visibility controls, and delegation allowlists differ. Specialist
+bodies remain identical so behavior does not drift while frontmatter preserves the strongest native
+restriction each host supports.
 
 ## Components
 
