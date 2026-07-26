@@ -1,7 +1,7 @@
 ---
-name: "StartBuilding Planner"
+name: startbuilding-planner
 description: "Plan a StartBuilding work item before implementation. Use for repository research, requirement analysis, implementation planning, risk identification, and verification design."
-tools: [read, search]
+tools: [read, search, Read, ToolSearch, Glob, Grep]
 agents: []
 user-invocable: false
 ---

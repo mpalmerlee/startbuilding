@@ -74,12 +74,12 @@ class Validation:
         ):
             self.fail("Plugin version must be semantic MAJOR.MINOR.PATCH")
 
-        if copilot.get("agents") != "copilot-agents/":
-            self.fail("Copilot manifest must use copilot-agents/")
+        if copilot.get("agents") != "agents/":
+            self.fail("Copilot manifest must use shared agents/")
         if copilot.get("skills") != "skills/":
             self.fail("Copilot manifest must use skills/")
-        if vscode.get("agents") != "copilot-agents/":
-            self.fail("VS Code precedence manifest must use copilot-agents/")
+        if vscode.get("agents") != "agents/":
+            self.fail("VS Code precedence manifest must use shared agents/")
         if vscode.get("skills") != "skills/":
             self.fail("VS Code precedence manifest must use skills/")
 
@@ -107,7 +107,7 @@ class Validation:
             "./references/artifact-contract.md",
             "./references/project-configuration.md",
             "./assets/project.json",
-            "StartBuilding Planner",
+            "startbuilding-planner",
             "startbuilding:startbuilding-planner",
         ):
             if marker not in body:
@@ -128,69 +128,41 @@ class Validation:
 
     def validate_agents(self) -> None:
         roles = ("coordinator", "planner", "implementer", "reviewer", "committer")
-        copilot_dir = self.root / "copilot-agents"
-        claude_dir = self.root / "agents"
-        copilot_files = sorted(copilot_dir.glob("*.agent.md")) if copilot_dir.is_dir() else []
-        claude_files = sorted(claude_dir.glob("*.md")) if claude_dir.is_dir() else []
-        if len(copilot_files) != 5:
-            self.fail("Expected exactly five Copilot agents")
-        if len(claude_files) != 5:
-            self.fail("Expected exactly five Claude agents")
+        agent_dir = self.root / "agents"
+        agent_files = sorted(agent_dir.glob("*.agent.md")) if agent_dir.is_dir() else []
+        if len(agent_files) != 5:
+            self.fail("Expected exactly five shared agents")
 
         expected_copilot_tools = {
-            "coordinator": "[read, search, edit, execute, agent]",
-            "planner": "[read, search]",
-            "implementer": "[read, search, edit, execute]",
-            "reviewer": "[read, search, execute]",
-            "committer": "[read, execute]",
+            "coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-planner, startbuilding:startbuilding-implementer, startbuilding:startbuilding-reviewer, startbuilding:startbuilding-committer)"]',
+            "planner": "[read, search, Read, ToolSearch, Glob, Grep]",
+            "implementer": "[read, search, edit, execute, Read, ToolSearch, Glob, Grep, Edit, Write, Bash]",
+            "reviewer": "[read, search, execute, Read, ToolSearch, Glob, Grep, Bash]",
+            "committer": "[read, execute, Read, ToolSearch, Glob, Grep, Bash]",
         }
-        expected_claude_tools = {
-            "planner": "Read, Glob, Grep",
-            "implementer": "Read, Glob, Grep, Edit, Write, Bash",
-            "reviewer": "Read, Glob, Grep, Bash",
-            "committer": "Read, Glob, Grep, Bash",
-        }
-        display_names = {role: f"StartBuilding {role.title()}" for role in roles}
+        agent_names = {role: f"startbuilding-{role}" for role in roles}
 
         for role in roles:
-            copilot_path = f"copilot-agents/startbuilding-{role}.agent.md"
-            claude_path = f"agents/startbuilding-{role}.md"
-            copilot_fields, copilot_body = self.read_frontmatter(copilot_path)
-            claude_fields, claude_body = self.read_frontmatter(claude_path)
+            agent_path = f"agents/startbuilding-{role}.agent.md"
+            agent_fields, _ = self.read_frontmatter(agent_path)
 
-            if copilot_fields.get("name") != display_names[role]:
-                self.fail(f"Invalid Copilot display name for {role}")
-            if copilot_fields.get("tools") != expected_copilot_tools[role]:
-                self.fail(f"Invalid Copilot tools for {role}")
-            if claude_fields.get("name") != f"startbuilding-{role}":
-                self.fail(f"Invalid Claude name for {role}")
-            if role != "coordinator" and claude_fields.get("tools") != expected_claude_tools[role]:
-                self.fail(f"Invalid Claude tools for {role}")
+            if agent_fields.get("name") != agent_names[role]:
+                self.fail(f"Invalid shared agent name for {role}")
+            if agent_fields.get("tools") != expected_copilot_tools[role]:
+                self.fail(f"Invalid shared tools for {role}")
 
             if role != "coordinator":
-                if copilot_fields.get("agents") != "[]":
-                    self.fail(f"Copilot {role} must prevent subagent use")
-                if copilot_fields.get("user-invocable") != "false":
-                    self.fail(f"Copilot {role} must be hidden from the normal picker")
-                if "Agent" in claude_fields.get("tools", ""):
-                    self.fail(f"Claude {role} must not spawn subagents")
-                if copilot_body != claude_body:
-                    self.fail(f"Agent behavior differs between clients for {role}")
+                if agent_fields.get("agents") != "[]":
+                    self.fail(f"Shared {role} must prevent subagent use")
+                if agent_fields.get("user-invocable") != "false":
+                    self.fail(f"Shared {role} must be hidden from the normal picker")
 
         coordinator = self.require_file(
-            "copilot-agents/startbuilding-coordinator.agent.md"
+            "agents/startbuilding-coordinator.agent.md"
         ).read_text(encoding="utf-8")
         for role in roles[1:]:
-            if display_names[role] not in coordinator:
-                self.fail(f"Copilot coordinator is missing {display_names[role]}")
-
-        claude_coordinator = self.require_file(
-            "agents/startbuilding-coordinator.md"
-        ).read_text(encoding="utf-8")
-        for role in roles[1:]:
-            scoped_name = f"startbuilding:startbuilding-{role}"
-            if scoped_name not in claude_coordinator:
-                self.fail(f"Claude coordinator is missing {scoped_name}")
+            if agent_names[role] not in coordinator:
+                self.fail(f"Shared coordinator is missing {agent_names[role]}")
 
         contract_markers = {
             "planner": ("Status: awaiting approval",),
@@ -200,7 +172,7 @@ class Validation:
         }
         for role, markers in contract_markers.items():
             text = self.require_file(
-                f"copilot-agents/startbuilding-{role}.agent.md"
+                f"agents/startbuilding-{role}.agent.md"
             ).read_text(encoding="utf-8")
             for marker in markers:
                 if marker not in text:
@@ -239,7 +211,7 @@ class Validation:
                 "/startbuilding:deliver",
                 "copilot plugin install mpalmerlee/startbuilding",
                 "claude plugin marketplace add mpalmerlee/startbuilding",
-                "Chat: Install Plugin From Source",
+                "VS Code also discovers plugins installed by Copilot CLI",
             ):
                 if marker not in readme_text:
                     self.fail(f"README is missing release marker: {marker}")

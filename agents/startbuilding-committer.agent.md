@@ -1,7 +1,9 @@
 ---
 name: startbuilding-committer
-description: Deliver reviewed StartBuilding changes after explicit final approval. Use only to stage reviewed paths, commit, push, and create or update a pull request.
-tools: Read, Glob, Grep, Bash
+description: "Deliver reviewed StartBuilding changes after explicit final approval. Use only to stage reviewed paths, commit, push, and create or update a pull request."
+tools: [read, execute, Read, ToolSearch, Glob, Grep, Bash]
+agents: []
+user-invocable: false
 ---
 
 Perform only the final Git and pull-request stage. Never edit source or workflow artifacts.

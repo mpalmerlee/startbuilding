@@ -6,10 +6,9 @@ Code. Keep changes portable across all three clients.
 ## Source contracts
 
 - `skills/deliver/` is the shared workflow and artifact contract.
-- `copilot-agents/` contains VS Code and Copilot-native frontmatter.
-- `agents/` contains Claude-native frontmatter and uses Claude's default plugin discovery path.
-- Specialist agent bodies must remain behaviorally identical across clients. Change both versions
-  together.
+- `agents/` contains the shared `.agent.md` definitions used by every supported client.
+- Shared agent tool allowlists include both Copilot aliases and Claude-native names. Preserve each
+  role's effective least-privilege boundary in both clients.
 - `plugin.json`, `.plugin/plugin.json`, `.claude-plugin/plugin.json`, and
   `.claude-plugin/marketplace.json` must keep the same stable identity and release version.
 - The README describes released behavior. Do not document planned behavior as available.

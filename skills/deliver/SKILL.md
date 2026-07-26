@@ -30,10 +30,10 @@ named specialist is missing.
 
 | Role | VS Code and Copilot | Claude Code |
 | --- | --- | --- |
-| Planner | `StartBuilding Planner` | `startbuilding:startbuilding-planner` |
-| Implementer | `StartBuilding Implementer` | `startbuilding:startbuilding-implementer` |
-| Reviewer | `StartBuilding Reviewer` | `startbuilding:startbuilding-reviewer` |
-| Committer | `StartBuilding Committer` | `startbuilding:startbuilding-committer` |
+| Planner | `startbuilding-planner` | `startbuilding:startbuilding-planner` |
+| Implementer | `startbuilding-implementer` | `startbuilding:startbuilding-implementer` |
+| Reviewer | `startbuilding-reviewer` | `startbuilding:startbuilding-reviewer` |
+| Committer | `startbuilding-committer` | `startbuilding:startbuilding-committer` |
 
 The parent context owns orchestration and writes only workflow artifacts. Persist each specialist's
 returned report exactly before changing `state.json`. The parent must not perform specialist work

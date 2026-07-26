@@ -17,17 +17,14 @@ plugin.json                         Copilot and VS Code manifest
 .claude-plugin/plugin.json          Claude Code manifest
 .claude-plugin/marketplace.json     Self-hosted Claude catalog
 skills/deliver/                     Shared workflow and artifact contract
-copilot-agents/                     Copilot-native agent definitions
-agents/                             Claude-native agent definitions
+agents/                             Shared cross-client agent definitions
 scripts/validate.sh                 Static validation entry point
 ```
 
-The manifests share the stable `startbuilding` identity and `skills/` tree. The `.plugin` copy has
-higher VS Code precedence and prevents a colocated Claude marketplace catalog from causing a direct
-source installation to load Claude-format agents. The manifests select separate agent definitions
-because host-native tool names, visibility controls, and delegation allowlists differ. Specialist
-bodies remain identical so behavior does not drift while frontmatter preserves the strongest native
-restriction each host supports.
+The manifests share the stable `startbuilding` identity and `skills/` and `agents/` trees. Copilot
+manifests explicitly select `agents/`; the metadata-only Claude manifest relies on conventional
+component discovery. Each shared `.agent.md` allowlist contains Copilot aliases and Claude-native
+tool names. Each host ignores unsupported names and retains its native least-privilege tools.
 
 ## Components
 
@@ -43,8 +40,8 @@ artifacts, selects the next state transition, and invokes one specialist at a ti
 | Committer | Staging, commit, push, and PR | read, execute | Read, Glob, Grep, Bash |
 
 The Coordinator is also available as an explicit agent entry point. Specialists are hidden from the
-normal Copilot picker but remain model-invocable. Claude plugin agents remain addressable by their
-scoped names.
+normal Copilot picker but remain model-invocable. Claude plugin agents use scoped display names such
+as `startbuilding:startbuilding-implementer`.
 
 ## State machine
 
@@ -91,6 +88,6 @@ installed plugin.
 
 ## Versioning
 
-Releases use semantic versioning. The version must match in both plugin manifests and the self-hosted
-catalog. Because clients cache explicit versions, every published behavior change requires a
-version bump and changelog entry.
+Releases use semantic versioning. The version must match in all three plugin manifests and the
+self-hosted catalog. Because clients cache explicit versions, every published behavior change
+requires a version bump and changelog entry.
