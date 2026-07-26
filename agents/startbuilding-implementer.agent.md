@@ -1,7 +1,7 @@
 ---
 name: "StartBuilding Implementer"
 description: "Implement an explicitly approved StartBuilding plan. Use for focused source changes, tests, and validation after a human approved the current content-bound plan artifact."
-tools: [read, search, edit, execute]
+tools: [read, search, edit, execute, Read, ToolSearch, Glob, Grep, Edit, Write, Bash]
 agents: []
 user-invocable: false
 ---

@@ -2,6 +2,16 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.1.2 - 2026-07-26
+
+### Fixed
+
+- Unified Copilot, VS Code, and Claude Code on one shared `agents/*.agent.md` inventory.
+- Added dual-vocabulary tool allowlists so each host preserves native role boundaries while ignoring
+  unsupported tool names.
+- Made Copilot CLI installation the tested path for VS Code Agent Host discovery, eliminating the
+  duplicate Claude-format agent set.
+
 ## 0.1.1 - 2026-07-26
 
 ### Fixed

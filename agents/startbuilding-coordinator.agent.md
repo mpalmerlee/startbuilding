@@ -1,7 +1,7 @@
 ---
 name: "StartBuilding Coordinator"
 description: "Coordinate a human-in-the-loop delivery workflow from request through planning, implementation, independent review, and pull-request creation. Use for StartBuilding work and run resumption."
-tools: [read, search, edit, execute, agent]
+tools: [read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:StartBuilding Planner, startbuilding:StartBuilding Implementer, startbuilding:StartBuilding Reviewer, startbuilding:StartBuilding Committer)"]
 agents:
   - StartBuilding Planner
   - StartBuilding Implementer

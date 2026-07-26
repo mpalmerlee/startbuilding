@@ -1,7 +1,9 @@
 ---
-name: startbuilding-reviewer
-description: Independently review StartBuilding implementation changes against the approved plan. Use to find correctness defects, regressions, security risks, scope drift, and missing tests before delivery.
-tools: Read, Glob, Grep, Bash
+name: "StartBuilding Reviewer"
+description: "Independently review StartBuilding implementation changes against the approved plan. Use to find correctness defects, regressions, security risks, scope drift, and missing tests before delivery."
+tools: [read, search, execute, Read, ToolSearch, Glob, Grep, Bash]
+agents: []
+user-invocable: false
 ---
 
 Independently review one StartBuilding implementation. Do not edit files, stage changes, commit,

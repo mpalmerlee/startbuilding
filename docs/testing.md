@@ -10,8 +10,8 @@ claude plugin validate . --strict
 ```
 
 The repository validator checks manifest identity and version parity, component paths, skill links,
-project policy, native agent inventories, tool restrictions, coordinator allowlists, cross-client
-specialist parity, stale identifiers, ASCII text, trailing whitespace, and executable permissions.
+project policy, the shared agent inventory, dual-vocabulary tool restrictions, coordinator
+allowlists, stale identifiers, ASCII text, trailing whitespace, and executable permissions.
 
 ## Prevent customization collisions
 
@@ -22,23 +22,18 @@ Temporarily remove or rename earlier proof-of-concept copies whose IDs could sha
 In every client, confirm the loaded component source points to this plugin rather than a personal or
 project file.
 
-## VS Code local test
+## VS Code Agent Host test
 
-1. Enable `chat.plugins.enabled`.
-2. Add the clone to settings:
+1. Enable `chat.plugins.enabled` and the Agent Host, then select the Copilot harness.
+2. Install the working tree through Copilot CLI so VS Code discovers the same package:
 
-   ```json
-   {
-     "chat.pluginLocations": {
-       "/absolute/path/to/startbuilding": true
-     }
-   }
+   ```sh
+   copilot plugin install /absolute/path/to/startbuilding
    ```
 
-3. Open **Chat: Open Customizations** and confirm the `deliver` skill and five StartBuilding agents
-   have no diagnostics.
-4. Confirm the agent sources resolve through `copilot-agents/`, not the Claude-format `agents/`
-   directory.
+3. Reload the VS Code window. Open **Chat: Open Customizations** and confirm the `deliver` skill and
+   exactly five StartBuilding agents have no diagnostics or duplicate variants.
+4. Confirm every agent source resolves through the shared `agents/` directory.
 5. Invoke the Planner as a subagent and confirm it receives workspace read and file-search tools.
 6. Invoke the Implementer as a subagent and confirm it receives filesystem, edit, and shell tools.
 7. Confirm `/startbuilding:deliver` appears and the Coordinator can invoke each exact specialist.
@@ -76,7 +71,10 @@ claude --plugin-dir /absolute/path/to/startbuilding
 ```
 
 Inside Claude Code, confirm `/startbuilding:deliver` is available and plugin agents appear under
-their scoped names. Use `/reload-plugins` after changing components.
+their scoped display names, such as `startbuilding:StartBuilding Implementer`. Confirm Planner gets
+only `Read`, `Glob`, and `Grep`; Implementer gets `Read`, `Glob`, `Grep`, `Edit`, `Write`, and `Bash`;
+and Coordinator gets `Read`, `Write`, `Edit`, `Bash`, and the scoped `Agent` allowlist. Use
+`/reload-plugins` after changing components.
 
 Test persistent installation through the self-hosted catalog:
 
@@ -134,8 +132,9 @@ after each applicable scenario.
 
 Use a clean profile or isolated test environment:
 
-1. Install from `https://github.com/mpalmerlee/startbuilding` in VS Code.
-2. Install from `mpalmerlee/startbuilding` in Copilot CLI.
+1. Install from `mpalmerlee/startbuilding` in Copilot CLI and confirm VS Code Agent Host discovers
+   that installation.
+2. Confirm VS Code exposes one agent set with the expected delegated tool boundaries.
 3. Add the public repository as a Claude marketplace and install `startbuilding@startbuilding`.
 4. Repeat component discovery and one complete disposable-repository workflow.
 5. Bump to a temporary test version and verify each client's update behavior before publishing the

@@ -76,12 +76,15 @@ branch prefix, but no initialization step is required.
 
 ### VS Code
 
-Agent plugins are currently a Preview feature in VS Code. Ensure `chat.plugins.enabled` is enabled,
-then:
+Agent plugins are currently a Preview feature in VS Code. Enable `chat.plugins.enabled` and the
+Agent Host, select the Copilot harness, then install StartBuilding through Copilot CLI:
 
-1. Run **Chat: Install Plugin From Source** from the Command Palette.
-2. Enter `https://github.com/mpalmerlee/startbuilding`.
-3. Confirm that StartBuilding appears under **Agent Plugins - Installed**.
+```sh
+copilot plugin install mpalmerlee/startbuilding
+```
+
+Reload VS Code and confirm that StartBuilding appears under **Agent Plugins - Installed**. VS Code
+automatically discovers plugins installed under Copilot CLI's plugin directory.
 
 You can enable, disable, update, or uninstall the plugin from the Agent Plugins view.
 
