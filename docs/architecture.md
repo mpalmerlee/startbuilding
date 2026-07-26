@@ -91,6 +91,6 @@ installed plugin.
 
 ## Versioning
 
-Releases use semantic versioning. The version must match in both plugin manifests and the self-hosted
-catalog. Because clients cache explicit versions, every published behavior change requires a
-version bump and changelog entry.
+Releases use semantic versioning. The version must match in all three plugin manifests and the
+self-hosted catalog. Because clients cache explicit versions, every published behavior change
+requires a version bump and changelog entry.
