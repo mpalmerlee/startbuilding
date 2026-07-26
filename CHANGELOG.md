@@ -12,8 +12,6 @@ All notable changes to StartBuilding are documented in this file.
 - Limited default implementation validation to focused checks plus explicitly configured or
   repository-required commands, and directed reviewers to reuse existing results.
 - Consolidated branch, secret, reviewed-path, staging, and GitHub checks at the Committer boundary.
-- Preserved compatibility with v0.1 run state and project configuration fields as ignored unknown
-  data.
 
 ## 0.1.2 - 2026-07-26
 

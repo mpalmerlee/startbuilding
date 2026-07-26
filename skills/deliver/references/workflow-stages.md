@@ -7,7 +7,7 @@ planning
   -> plan_review
   -> implementation
   -> implementation_blocked | automated_review
-  -> changes_requested | review_approval
+  -> changes_requested | delivery_confirmation
   -> delivered | delivery_blocked
 ```
 
@@ -70,7 +70,7 @@ path list into `reviewedPaths`.
 - For `Verdict: changes requested`, set stage `changes_requested`, report findings, and stop for
   human direction. Do not automatically repair findings.
 - For `Verdict: ready for delivery`, require `reviewedPaths` to cover every `implementationPaths`
-  entry, set stage `review_approval`, present the review, and stop for delivery confirmation.
+  entry, set stage `delivery_confirmation`, present the review, and stop for delivery confirmation.
 - Any missing or malformed verdict blocks the workflow.
 
 When the user directs repairs, determine whether the approved plan still covers them. If scope or

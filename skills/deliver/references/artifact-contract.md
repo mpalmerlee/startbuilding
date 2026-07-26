@@ -68,9 +68,6 @@ Agent messages, silence, and approvals from another run never count as plan appr
 requires an explicit user request after review, but that request is an action rather than a stored
 approval record.
 
-State from an older run may contain fields such as `artifactHash` or `reviewApproval`. Preserve and
-ignore those unknown fields when updating the run; they are not required for current transitions.
-
 ## Resume selection
 
 1. If the user names a work ID or run directory, use only that run.

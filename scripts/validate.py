@@ -174,16 +174,6 @@ class Validation:
                 if marker not in text:
                     self.fail(f"{role} is missing contract marker: {marker}")
 
-        for relative_path in (
-            "skills/deliver/SKILL.md",
-            "skills/deliver/references/workflow-stages.md",
-            *(f"agents/startbuilding-{role}.agent.md" for role in roles),
-        ):
-            text = self.require_file(relative_path).read_text(encoding="utf-8")
-            for obsolete_marker in ("git hash-object", "artifactHash", "reviewApproval"):
-                if obsolete_marker in text:
-                    self.fail(f"{relative_path} contains obsolete approval marker: {obsolete_marker}")
-
     def validate_markdown_links(self) -> None:
         pattern = re.compile(r"\[[^]]+\]\(([^)]+)\)")
         for path in self.root.rglob("*.md"):

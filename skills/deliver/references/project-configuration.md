@@ -21,8 +21,8 @@ prefix.
   be staged by StartBuilding.
 - `branchPrefix` must be a nonempty Git-safe prefix ending in `/`.
 
-Unknown fields must be preserved and ignored for forward compatibility. Invalid JSON or an invalid
-known field blocks mutation until the repository owner fixes the configuration.
+Unknown fields must be preserved and ignored. Invalid JSON or an invalid known field blocks
+mutation until the repository owner fixes the configuration.
 
 ## Defaults
 

@@ -50,16 +50,13 @@ planning
   -> plan_review
   -> implementation
   -> implementation_blocked | automated_review
-  -> changes_requested | review_approval
+  -> changes_requested | delivery_confirmation
   -> delivered | delivery_blocked
 ```
 
-The `review_approval` name is retained so v0.1 runs remain resumable; it now means that review is
-complete and the run is waiting for delivery confirmation.
-
 The transition out of `plan_review` requires explicit user approval of the current plan. The
-transition out of `review_approval` requires a later explicit delivery request. The turn that
-creates either the plan or review stops before the gated work.
+transition out of `delivery_confirmation` requires a later explicit delivery request. The turn
+that creates either the plan or review stops before the gated work.
 
 Plan approval records the current plan artifact, UTC time, and short approval text. Plans are never
 overwritten; a revision creates a suffixed artifact and changes `currentPlan`, invalidating prior

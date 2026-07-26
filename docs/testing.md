@@ -124,15 +124,10 @@ Run the same work request independently in VS Code, Copilot CLI, and Claude Code
 | Unrelated working-tree change | Preserved and excluded from staged paths |
 | Explicit delivery request | Stages only reviewed paths, commits, pushes, and creates a PR |
 | New chat session | Resumes the named run from `state.json` and current artifacts |
-| v0.1 run state | Preserves and ignores obsolete approval fields while resuming by current pointers |
 | Multiple active runs | Lists candidates and asks instead of guessing |
 
 Inspect Git status, the staged diff, commit contents, remote branch, pull-request body, and run state
 after each applicable scenario.
-
-For v0.1 compatibility, add `artifactHash` to `planApproval` and a `reviewApproval` object in a
-nonterminal run. Resume it, perform one state transition, and confirm those unknown fields are
-preserved but do not affect transition selection or require hash commands.
 
 ## Clean-install release test
 
