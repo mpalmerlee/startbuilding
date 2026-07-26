@@ -1,0 +1,19 @@
+{
+  "name": "startbuilding",
+  "displayName": "StartBuilding",
+  "description": "Human-reviewed planning, implementation, independent review, and pull-request delivery with focused coding agents.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Matt Palmerlee"
+  },
+  "homepage": "https://github.com/mpalmerlee/startbuilding#readme",
+  "repository": "https://github.com/mpalmerlee/startbuilding",
+  "license": "MIT",
+  "keywords": [
+    "software-workflow",
+    "planning",
+    "code-review",
+    "pull-request"
+  ],
+  "skills": "./skills/"
+}

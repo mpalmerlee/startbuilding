@@ -1,0 +1,17 @@
+{
+  "name": "startbuilding",
+  "owner": {
+    "name": "Matt Palmerlee"
+  },
+  "metadata": {
+    "description": "StartBuilding plugin releases",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "startbuilding",
+      "source": "./",
+      "description": "Human-reviewed software delivery with focused coding agents"
+    }
+  ]
+}
