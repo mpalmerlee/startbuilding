@@ -2,7 +2,8 @@
 
 StartBuilding is a human-in-the-loop software delivery plugin for VS Code, GitHub Copilot CLI, and
 Claude Code. Give it a work request and focused agents plan the change, implement it, review it, and
-prepare a pull request without crossing the important approval boundaries on your behalf.
+prepare a pull request without spending implementation tokens before plan approval or performing
+Git delivery before you ask.
 
 StartBuilding uses the coding-agent host, Git, and local Markdown and JSON artifacts. It does not
 run a background service, database, scheduler, or separate orchestration UI.
@@ -19,7 +20,7 @@ StartBuilding coordinates five focused roles:
 - The **Reviewer** independently checks the approved plan, implementation report, and complete
   working-tree diff. It cannot edit files.
 - The **Committer** stages reviewed paths, commits, pushes, and creates or updates the pull request
-  after final approval. It cannot edit source code.
+  after an explicit delivery request. It cannot edit source code.
 
 The delivery workflow is:
 
@@ -31,8 +32,8 @@ The delivery workflow is:
    changes, adds tests where appropriate, and validates the result.
 5. **Independent review**: the Reviewer inspects the full diff and reports correctness defects,
    regressions, security risks, and missing tests.
-6. **Delivery approval**: StartBuilding stops again. A commit, push, or pull request requires your
-   explicit approval of the current review.
+6. **Delivery confirmation**: StartBuilding stops again and presents the review. A commit, push, or
+  pull request requires a later explicit delivery request.
 7. **Delivery**: the Committer verifies the staged diff, creates a focused commit, pushes the branch,
    and creates or updates the pull request with `gh`.
 
@@ -53,17 +54,18 @@ Each run is stored locally under:
 `-- state.json
 ```
 
-These artifacts make the workflow reviewable and resumable across chat sessions. Approvals are
-bound to the exact artifact content, so editing an approved plan or review requires fresh approval.
-Run artifacts are transient by default and should be excluded from source control:
+These artifacts make the workflow reviewable and resumable across chat sessions. Plan approval
+records the current plan artifact. A revision creates a new artifact and requires fresh approval;
+delivery confirmation is not stored as a formal approval. Run artifacts are transient by default
+and should be excluded from source control:
 
 ```gitignore
 .startbuilding/runs/
 ```
 
-StartBuilding follows the target repository's instructions and existing build configuration. An
-optional `.startbuilding/project.json` can override validation commands, protected paths, and the
-branch prefix, but no initialization step is required.
+StartBuilding follows the target repository's instructions. An optional
+`.startbuilding/project.json` can define validation commands, protected paths, and the branch
+prefix, but no initialization step is required.
 
 ## Requirements
 
@@ -149,15 +151,17 @@ When more than one unfinished run exists, StartBuilding asks you to select one r
 
 ## Safety boundaries
 
-- Approval is never inferred from silence, a favorable automated review, or an agent message.
+- Plan approval is never inferred from silence, an agent message, or approval from another run.
+- A favorable automated review does not trigger delivery without an explicit user request.
 - Planning and review are read-only roles enforced through host-native tool restrictions.
 - Implementation never commits or pushes.
 - Delivery never edits source files and stages only reviewed implementation paths.
-- StartBuilding refuses to deliver from the default branch or with stale approvals.
+- StartBuilding refuses to implement when plan approval names a different current plan or to deliver
+  from the default branch.
 - `.startbuilding/runs/`, environment files, credentials, protected paths, and unrelated changes are
   excluded from delivery.
 - Existing user changes are preserved and reported when they prevent safe continuation.
 
 StartBuilding deliberately keeps orchestration local and visible. The repository remains the source
 of truth for architecture and validation, Git remains the source of truth for changes, and the
-developer remains the authority at both approval gates.
+developer remains the authority over plan approval and delivery.

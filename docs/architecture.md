@@ -54,13 +54,16 @@ planning
   -> delivered | delivery_blocked
 ```
 
-The transition out of `plan_review` requires explicit user approval of the current plan. The
-transition out of `review_approval` requires explicit user approval of the current review and a
-delivery request. The turn that creates either artifact stops at its gate.
+The `review_approval` name is retained so v0.1 runs remain resumable; it now means that review is
+complete and the run is waiting for delivery confirmation.
 
-Every approval records the artifact path, its Git object hash, UTC time, and short approval text.
-The hash is recomputed immediately before gated work. Editing or replacing the artifact invalidates
-approval.
+The transition out of `plan_review` requires explicit user approval of the current plan. The
+transition out of `review_approval` requires a later explicit delivery request. The turn that
+creates either the plan or review stops before the gated work.
+
+Plan approval records the current plan artifact, UTC time, and short approval text. Plans are never
+overwritten; a revision creates a suffixed artifact and changes `currentPlan`, invalidating prior
+approval. Delivery confirmation is an action request and is not stored as an approval record.
 
 ## Delivery scope
 
@@ -74,9 +77,9 @@ delivery.
 
 ## Trust model
 
-The primary controls are native tool allowlists, isolated specialist contexts, artifact-bound human
-approval, and explicit Git path staging. Instructions reinforce those controls but do not replace
-them.
+The primary controls are native tool allowlists, isolated specialist contexts, current-plan human
+approval, explicit delivery confirmation, and explicit Git path staging. Instructions reinforce
+those controls but do not replace them.
 
 StartBuilding intentionally ships no hooks or executable plugin runtime. The only bundled
 executable is a contributor-facing static validator. Target-repository commands run through the

@@ -11,7 +11,7 @@ lowercase, hyphenated identifier. Add `.startbuilding/runs/` to the target repos
 - `implementation.md`: exact initial Implementer output.
 - `review.md`: exact initial Reviewer output.
 - `delivery.md`: exact Committer result.
-- `state.json`: machine-readable stage, pointers, path scope, and approvals.
+- `state.json`: machine-readable stage, pointers, path scope, and plan approval.
 
 Never overwrite completed evidence. A repeated stage uses the next available numeric suffix, such
 as `plan-2.md`, `implementation-2.md`, or `review-2.md`, and updates the corresponding current
@@ -32,7 +32,6 @@ Create state with this minimum shape and preserve unknown fields whenever it is 
   "implementationPaths": [],
   "reviewedPaths": [],
   "planApproval": null,
-  "reviewApproval": null,
   "createdAt": "2026-01-01T00:00:00Z",
   "updatedAt": "2026-01-01T00:00:00Z"
 }
@@ -45,35 +44,32 @@ not traverse outside the repository.
 `reviewedPaths` contains only implementation paths covered by the current review and eligible for
 delivery. Unrelated pre-existing changes belong in neither list.
 
-## Content-bound approvals
+## Plan approval
 
-Approval must originate from explicit user language and identify the current artifact, either by
-path or unambiguously as the current plan or review in the named run. Record the user's short exact
-approval text, not unrelated conversation.
+Plan approval must originate from explicit user language and identify the current plan, either by
+path or unambiguously as the current plan in the named run. Record the user's short exact approval
+text, not unrelated conversation.
 
-Before recording approval, compute the artifact identity from the repository root:
-
-```sh
-git hash-object --no-filters -- .startbuilding/runs/<work-id>/<artifact>
-```
-
-Use this shape for both plan and review approvals:
+Use this shape for plan approval:
 
 ```json
 {
   "artifact": "plan.md",
-  "artifactHash": "0123456789abcdef0123456789abcdef01234567",
   "approvedAt": "2026-01-01T00:10:00Z",
   "approvalText": "Approve the current plan and continue"
 }
 ```
 
-Before any gated action, recompute the hash and require exact equality with `artifactHash`. An
-edited artifact, a changed current pointer, or a missing hash invalidates approval. Set the stale
-approval to `null`, return to the corresponding approval stage, and stop.
+Before implementation, require `planApproval.artifact` to equal `currentPlan`. A revised plan is
+written to a new suffixed artifact and changes `currentPlan`, which invalidates the prior approval.
+Set stale plan approval to `null`, return to `plan_review`, and stop.
 
-Agent messages, review verdicts, silence, and approvals from another run never count as user
-approval.
+Agent messages, silence, and approvals from another run never count as plan approval. Delivery
+requires an explicit user request after review, but that request is an action rather than a stored
+approval record.
+
+State from an older run may contain fields such as `artifactHash` or `reviewApproval`. Preserve and
+ignore those unknown fields when updating the run; they are not required for current transitions.
 
 ## Resume selection
 

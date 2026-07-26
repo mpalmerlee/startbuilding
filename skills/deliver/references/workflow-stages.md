@@ -19,8 +19,8 @@ Update `state.json` only after the corresponding artifact has been written succe
    and the run selection rules in the artifact contract.
 2. For a new request, create the run directory, `request.md`, and initial `state.json` with stage
    `planning`.
-3. For a resumed request, validate the state shape, current artifact pointers, and any approval hash
-   before choosing a transition.
+3. For a resumed request, validate the state shape and current artifact pointers before choosing a
+  transition.
 4. Preserve unrelated working-tree changes. Report them before implementation and delivery.
 
 ## Planning
@@ -34,8 +34,8 @@ Never implement in the turn that creates or revises a plan.
 
 ## Plan approval and branch preparation
 
-Continue only after explicit user approval of `currentPlan`. Hash and record that artifact as
-defined by the artifact contract. Recompute and verify the hash immediately before implementation.
+Continue only after explicit user approval of `currentPlan`. Record that approval as defined by the
+artifact contract and require `planApproval.artifact` to equal `currentPlan` before implementation.
 
 Determine the default branch from the remote HEAD or repository metadata. Before editing, require a
 non-default branch. Create `<branchPrefix><work-id>` when needed without resetting, cleaning,
@@ -47,7 +47,9 @@ approval, and stop at `plan_review`.
 ## Implementation
 
 Invoke the native Implementer with the approved plan, run path, existing-change summary, and
-validation policy. The Implementer must verify the plan hash before its first edit.
+validation policy. After its first substantive edit, the Implementer runs the narrowest relevant
+check. It then runs only commands explicitly configured in `.startbuilding/project.json` or
+required by applicable repository instructions.
 
 Persist its exact report to the next implementation artifact and set `currentImplementation`.
 Copy only its explicit repository-relative changed-path list into `implementationPaths` after
@@ -63,12 +65,12 @@ working-tree diff, and `implementationPaths`. The Reviewer may execute focused c
 edit.
 
 Persist its exact report to the next review artifact, set `currentReview`, copy its explicit reviewed
-path list into `reviewedPaths`, and clear `reviewApproval`.
+path list into `reviewedPaths`.
 
 - For `Verdict: changes requested`, set stage `changes_requested`, report findings, and stop for
   human direction. Do not automatically repair findings.
-- For `Verdict: ready for human approval`, require `reviewedPaths` to cover every
-  `implementationPaths` entry, set stage `review_approval`, and stop for final approval.
+- For `Verdict: ready for delivery`, require `reviewedPaths` to cover every `implementationPaths`
+  entry, set stage `review_approval`, present the review, and stop for delivery confirmation.
 - Any missing or malformed verdict blocks the workflow.
 
 When the user directs repairs, determine whether the approved plan still covers them. If scope or
@@ -76,16 +78,15 @@ behavior changes, revise the plan and obtain fresh plan approval. Otherwise reco
 clear stale review state, invoke the Implementer for a suffixed implementation artifact, and review
 again.
 
-## Review approval and delivery
+## Delivery confirmation
 
-Continue only when the user explicitly approves `currentReview` and requests delivery. Hash and
-record that review as defined by the artifact contract. Recompute both approval hashes immediately
-before invoking the Committer.
+Continue only when the user explicitly requests delivery after the current review. Treat that
+request as an action, not a stored approval record, and invoke the Committer.
 
 The Committer must block unless all of these are true:
 
-- both current artifacts match their approval hashes;
-- the review verdict is `ready for human approval`;
+- the current plan matches the recorded plan approval;
+- the review verdict is `ready for delivery`;
 - `reviewedPaths` covers all and only intended `implementationPaths`;
 - the current branch is not the default branch;
 - no reviewed path matches protected paths or likely secret files;

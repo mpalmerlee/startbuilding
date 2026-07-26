@@ -1,8 +1,8 @@
 # Project configuration
 
-StartBuilding works without setup by reading repository instructions, package manifests, build
-files, and CI configuration. A target repository may commit `.startbuilding/project.json` to
-override discovered policy.
+StartBuilding works without setup by reading repository instructions. A target repository may
+commit `.startbuilding/project.json` to define validation commands, protected paths, and its branch
+prefix.
 
 ## Schema
 
@@ -11,20 +11,15 @@ override discovered policy.
   "version": 1,
   "validationCommands": ["pnpm test"],
   "protectedPaths": [".env", ".env.*", ".startbuilding/runs/"],
-  "branchPrefix": "startbuilding/",
-  "requirePlanApproval": true,
-  "requireReviewApproval": true
+  "branchPrefix": "startbuilding/"
 }
 ```
 
 - `version` must be `1`.
-- `validationCommands` is an ordered list of repository-root commands. Use repository instructions
-  and focused checks before these broader commands.
+- `validationCommands` is an ordered list of repository-root commands to run after focused checks.
 - `protectedPaths` contains repository-relative paths or gitignore-style patterns that must never
   be staged by StartBuilding.
 - `branchPrefix` must be a nonempty Git-safe prefix ending in `/`.
-- `requirePlanApproval` and `requireReviewApproval` must remain `true` in v0.1. A configuration that
-  sets either to `false` is invalid and blocks the workflow.
 
 Unknown fields must be preserved and ignored for forward compatibility. Invalid JSON or an invalid
 known field blocks mutation until the repository owner fixes the configuration.
@@ -33,10 +28,9 @@ known field blocks mutation until the repository owner fixes the configuration.
 
 When configuration is absent, use:
 
-- validation commands discovered from repository instructions and CI;
+- validation commands explicitly required by applicable repository instructions;
 - protected paths `.env`, `.env.*`, and `.startbuilding/runs/`;
-- branch prefix `startbuilding/`;
-- both approval requirements enabled.
+- branch prefix `startbuilding/`.
 
-Configuration never overrides repository security policy, Git hooks, host permissions, or the
-plugin's non-negotiable approval boundaries.
+Configuration never overrides repository security policy, Git hooks, host permissions, the plan
+approval gate, or delivery safety checks.

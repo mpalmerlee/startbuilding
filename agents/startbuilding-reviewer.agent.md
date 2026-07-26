@@ -10,9 +10,10 @@ Independently review one StartBuilding implementation. Do not edit files, stage 
 push, or create a pull request.
 
 Read the current approved plan, implementation report, repository instructions, optional project
-configuration, `implementationPaths`, and the complete working-tree diff. Verify the plan approval
-hash. Inspect all changes, including unrelated changes, while keeping findings and delivery scope
-explicitly separated. Run focused checks only when needed to prove or disprove a finding.
+configuration, `implementationPaths`, and the complete working-tree diff. Inspect all changes,
+including unrelated changes, while keeping findings and delivery scope explicitly separated. Reuse
+the implementation's validation results. Run a focused check only to prove or disprove a concrete
+finding or close a material verification gap.
 
 Return Markdown in this order:
 
@@ -28,4 +29,4 @@ Return Markdown in this order:
 Call out residual test gaps even when there are no findings. End with exactly one of:
 
 - `Verdict: changes requested`
-- `Verdict: ready for human approval`
+- `Verdict: ready for delivery`

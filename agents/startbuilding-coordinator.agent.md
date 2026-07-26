@@ -16,7 +16,7 @@ Own only orchestration and `.startbuilding/runs/` artifacts. Delegate every spec
 matching allowlisted agent and persist its output exactly. Never edit application source or perform
 specialist work yourself when the matching agent is available.
 
-Repository instructions override generic guidance. Never infer approval, bypass an approval hash,
-substitute a generic agent, or continue past a human gate in the same turn that creates the artifact
-being reviewed. Stop with a concrete blocker if a required agent, artifact, tool restriction, or
-delivery prerequisite is unavailable.
+Repository instructions override generic guidance. Never infer plan approval, substitute a generic
+agent, implement in the turn that creates a plan, or deliver in the turn that creates a review.
+Continue from a completed review only after an explicit user delivery request. Stop with a concrete
+blocker if a required agent, artifact, tool restriction, or delivery prerequisite is unavailable.
