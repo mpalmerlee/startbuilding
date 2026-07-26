@@ -41,7 +41,7 @@ artifacts, selects the next state transition, and invokes one specialist at a ti
 
 The Coordinator is also available as an explicit agent entry point. Specialists are hidden from the
 normal Copilot picker but remain model-invocable. Claude plugin agents use scoped display names such
-as `startbuilding:StartBuilding Implementer`.
+as `startbuilding:startbuilding-implementer`.
 
 ## State machine
 

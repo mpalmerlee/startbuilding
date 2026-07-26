@@ -71,7 +71,7 @@ claude --plugin-dir /absolute/path/to/startbuilding
 ```
 
 Inside Claude Code, confirm `/startbuilding:deliver` is available and plugin agents appear under
-their scoped display names, such as `startbuilding:StartBuilding Implementer`. Confirm Planner gets
+their scoped names, such as `startbuilding:startbuilding-implementer`. Confirm Planner gets
 only `Read`, `Glob`, and `Grep`; Implementer gets `Read`, `Glob`, `Grep`, `Edit`, `Write`, and `Bash`;
 and Coordinator gets `Read`, `Write`, `Edit`, `Bash`, and the scoped `Agent` allowlist. Use
 `/reload-plugins` after changing components.

@@ -107,8 +107,8 @@ class Validation:
             "./references/artifact-contract.md",
             "./references/project-configuration.md",
             "./assets/project.json",
-            "StartBuilding Planner",
-            "startbuilding:StartBuilding Planner",
+            "startbuilding-planner",
+            "startbuilding:startbuilding-planner",
         ):
             if marker not in body:
                 self.fail(f"Skill is missing contract marker: {marker}")
@@ -134,20 +134,20 @@ class Validation:
             self.fail("Expected exactly five shared agents")
 
         expected_copilot_tools = {
-            "coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:StartBuilding Planner, startbuilding:StartBuilding Implementer, startbuilding:StartBuilding Reviewer, startbuilding:StartBuilding Committer)"]',
+            "coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-planner, startbuilding:startbuilding-implementer, startbuilding:startbuilding-reviewer, startbuilding:startbuilding-committer)"]',
             "planner": "[read, search, Read, ToolSearch, Glob, Grep]",
             "implementer": "[read, search, edit, execute, Read, ToolSearch, Glob, Grep, Edit, Write, Bash]",
             "reviewer": "[read, search, execute, Read, ToolSearch, Glob, Grep, Bash]",
             "committer": "[read, execute, Read, ToolSearch, Glob, Grep, Bash]",
         }
-        display_names = {role: f"StartBuilding {role.title()}" for role in roles}
+        agent_names = {role: f"startbuilding-{role}" for role in roles}
 
         for role in roles:
             agent_path = f"agents/startbuilding-{role}.agent.md"
             agent_fields, _ = self.read_frontmatter(agent_path)
 
-            if agent_fields.get("name") != display_names[role]:
-                self.fail(f"Invalid shared display name for {role}")
+            if agent_fields.get("name") != agent_names[role]:
+                self.fail(f"Invalid shared agent name for {role}")
             if agent_fields.get("tools") != expected_copilot_tools[role]:
                 self.fail(f"Invalid shared tools for {role}")
 
@@ -161,8 +161,8 @@ class Validation:
             "agents/startbuilding-coordinator.agent.md"
         ).read_text(encoding="utf-8")
         for role in roles[1:]:
-            if display_names[role] not in coordinator:
-                self.fail(f"Shared coordinator is missing {display_names[role]}")
+            if agent_names[role] not in coordinator:
+                self.fail(f"Shared coordinator is missing {agent_names[role]}")
 
         contract_markers = {
             "planner": ("Status: awaiting approval",),
