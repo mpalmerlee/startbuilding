@@ -6,7 +6,5 @@
     ".env.*",
     ".startbuilding/runs/"
   ],
-  "branchPrefix": "startbuilding/",
-  "requirePlanApproval": true,
-  "requireReviewApproval": true
+  "branchPrefix": "startbuilding/"
 }

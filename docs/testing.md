@@ -110,18 +110,19 @@ Run the same work request independently in VS Code, Copilot CLI, and Claude Code
 | New request | Creates `request.md` and valid `state.json` |
 | Planning | Uses the native Planner, writes `plan.md`, and stops |
 | No plan approval | Implementer refuses without edits |
-| Edited approved plan | Hash mismatch clears approval and stops |
+| Revised plan | Writes a suffixed plan, changes `currentPlan`, clears approval, and stops |
 | Explicit plan approval | Creates or uses a non-default branch and implements |
 | First implementation edit | Runs a focused check immediately afterward |
+| Configured validation | Runs explicitly configured or repository-required commands once |
 | Implementation completion | Reports exact changed paths and does not stage or commit |
-| Independent review | Reads the complete diff, reports reviewed paths, and does not edit |
+| Independent review | Reads the complete diff, reuses validation results, reports reviewed paths, and does not edit |
 | Review findings | Stops for human direction without automatic repair |
-| No review approval | Committer refuses without side effects |
-| Edited approved review | Hash mismatch clears approval and stops |
+| Clean review | Reports ready for delivery and stops for a later user request |
+| No delivery request | Makes no commit, push, or pull-request side effects |
 | Missing or unauthenticated `gh` | Delivery blocks before commit |
 | Protected or secret path | Delivery blocks and stages nothing |
 | Unrelated working-tree change | Preserved and excluded from staged paths |
-| Explicit review approval | Stages only reviewed paths, commits, pushes, and creates a PR |
+| Explicit delivery request | Stages only reviewed paths, commits, pushes, and creates a PR |
 | New chat session | Resumes the named run from `state.json` and current artifacts |
 | Multiple active runs | Lists candidates and asks instead of guessing |
 

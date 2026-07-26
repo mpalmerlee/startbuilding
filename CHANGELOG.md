@@ -2,6 +2,17 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.2.0 - 2026-07-26
+
+### Changed
+
+- Replaced Git-hash-bound plan approval with a lightweight current-plan artifact pointer.
+- Replaced formal review approval records with a simple delivery confirmation after independent
+  review.
+- Limited default implementation validation to focused checks plus explicitly configured or
+  repository-required commands, and directed reviewers to reuse existing results.
+- Consolidated branch, secret, reviewed-path, staging, and GitHub checks at the Committer boundary.
+
 ## 0.1.2 - 2026-07-26
 
 ### Fixed

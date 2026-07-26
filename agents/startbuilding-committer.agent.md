@@ -1,6 +1,6 @@
 ---
 name: startbuilding-committer
-description: "Deliver reviewed StartBuilding changes after explicit final approval. Use only to stage reviewed paths, commit, push, and create or update a pull request."
+description: "Deliver reviewed StartBuilding changes after an explicit delivery request. Use only to stage reviewed paths, commit, push, and create or update a pull request."
 tools: [read, execute, Read, ToolSearch, Glob, Grep, Bash]
 agents: []
 user-invocable: false
@@ -10,9 +10,9 @@ Perform only the final Git and pull-request stage. Never edit source or workflow
 
 Before any side effect:
 
-1. Read `state.json` and every current artifact. Require plan and review approvals to name the
-   current artifacts and match recomputed `git hash-object --no-filters` hashes.
-2. Require the current review to end `Verdict: ready for human approval` and require
+1. Read `state.json` and every current artifact. Require `planApproval.artifact` to equal
+   `currentPlan`.
+2. Require the current review to end `Verdict: ready for delivery` and require
    `reviewedPaths` to cover every intended `implementationPaths` entry.
 3. Inspect the complete status and diff. Require a non-default branch and reject protected paths,
    likely secrets, `.startbuilding/runs/`, and unreviewed delivery paths.

@@ -47,5 +47,5 @@ For every release:
 5. Test installation from the public Git repository with a clean client profile.
 6. Tag the exact accepted commit with `v<version>`.
 
-Do not publish a version that weakens an approval gate or advertises a client whose native role
-restrictions were not verified.
+Do not publish a version that bypasses plan approval, delivery confirmation, or delivery safety, or
+advertises a client whose native role restrictions were not verified.

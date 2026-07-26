@@ -118,10 +118,6 @@ class Validation:
             self.fail("Project configuration version must be 1")
         if config.get("branchPrefix") != "startbuilding/":
             self.fail("Default branch prefix must be startbuilding/")
-        if config.get("requirePlanApproval") is not True:
-            self.fail("Plan approval must be required")
-        if config.get("requireReviewApproval") is not True:
-            self.fail("Review approval must be required")
         protected = config.get("protectedPaths")
         if not isinstance(protected, list) or ".startbuilding/runs/" not in protected:
             self.fail("Run artifacts must be protected")
@@ -166,8 +162,8 @@ class Validation:
 
         contract_markers = {
             "planner": ("Status: awaiting approval",),
-            "implementer": ("git hash-object --no-filters", "Status: ready for review"),
-            "reviewer": ("Verdict: changes requested", "Verdict: ready for human approval"),
+            "implementer": ("planApproval.artifact", "Status: ready for review"),
+            "reviewer": ("Verdict: changes requested", "Verdict: ready for delivery"),
             "committer": ("gh auth status", "git add -A", "Status: delivered"),
         }
         for role, markers in contract_markers.items():

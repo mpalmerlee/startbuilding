@@ -15,7 +15,8 @@ Code. Keep changes portable across all three clients.
 
 ## Constraints
 
-- Preserve both explicit, content-bound human approval gates.
+- Preserve explicit approval of the current plan before implementation and an explicit delivery
+  request after review.
 - Keep planner and reviewer roles read-only through native tool restrictions.
 - Keep implementation separate from commit, push, and pull-request delivery.
 - Do not add hooks, MCP/LSP servers, compiled extension code, or runtime services without an
@@ -33,4 +34,4 @@ claude plugin validate . --strict
 ```
 
 When client behavior changes, also follow `docs/testing.md`. A release is blocked if a claimed
-client does not enforce the documented role boundaries and approval gates.
+client does not enforce the documented role boundaries, plan gate, and delivery safeguards.
