@@ -61,12 +61,12 @@ Copilot CLI, and Claude Code; defer submission to third-party community marketpl
 
 ### Phase 3: Port the five roles with native enforcement
 
-11. Create Copilot/VS Code agents under `agents/copilot/`:
+11. Create Copilot/VS Code agents under `copilot-agents/`:
     `startbuilding-coordinator.agent.md`, planner, implementer, reviewer, and committer. Port the POC
     bodies, use StartBuilding display names, retain `user-invocable: false` and `agents: []` for
     specialists, grant only native `read/search/edit/execute/agent` tools required by each role,
     and allow the coordinator to invoke exactly the four specialists.
-12. Create behaviorally equivalent Claude agents under `agents/claude/` using Claude's lowercase
+12. Create behaviorally equivalent Claude agents under `agents/` using Claude's lowercase
     `name`, `Read/Glob/Grep/Edit/Write/Bash/Agent(...)` vocabulary, and native
     allowlists/omissions. Specialists must omit `Agent`; planner and reviewer omit write tools;
     implementer cannot perform delivery; committer has no edit/write tools. The coordinator may
@@ -109,7 +109,8 @@ Copilot CLI, and Claude Code; defer submission to third-party community marketpl
     `~/.copilot/skills/software-delivery/` entries. Confirm the namespaced skill, coordinator,
     hidden specialists, exact delegated agent identities, diagnostics, and plugin disable/enable
     lifecycle.
-20. Validate Copilot CLI from the local path, then from `mpalmerlee/startbuilding`; confirm
+20. Validate Copilot CLI session-locally with `--plugin-dir`, then install from
+   `mpalmerlee/startbuilding`; confirm
     list/update/disable/enable/uninstall behavior and that VS Code discovers the CLI-installed
     plugin. Run the complete disposable-repository workflow through both approval gates.
 21. Validate Claude Code with `claude plugin validate . --strict` and `claude --plugin-dir`, then
@@ -139,8 +140,8 @@ Copilot CLI, and Claude Code; defer submission to third-party community marketpl
 - `skills/deliver/references/workflow-stages.md` - State transitions, gates, blocked states, and
   repair loops.
 - `skills/deliver/assets/project.json` - Optional configuration template.
-- `agents/copilot/` - Five Copilot/VS Code `.agent.md` definitions.
-- `agents/claude/` - Five Claude-native agent definitions with equivalent role bodies.
+- `copilot-agents/` - Five Copilot/VS Code `.agent.md` definitions.
+- `agents/` - Five Claude-native agent definitions with equivalent role bodies.
 - `scripts/validate.sh` - Structural, parity, stale-name, link, and policy validation.
 - `.github/workflows/validate.yml` - CI validation.
 - `docs/architecture.md` - Client architecture, role matrix, and trust boundaries.
@@ -163,8 +164,8 @@ Copilot CLI, and Claude Code; defer submission to third-party community marketpl
    `claude --debug` when component loading is ambiguous.
 3. In VS Code, inspect Chat Customizations diagnostics and Agent Plugins views; verify source paths
    so personal/project precedence cannot mask the plugin.
-4. In Copilot CLI, test local-path and Git installs plus `list`, `update`, `disable`, `enable`, and
-   `uninstall`; confirm VS Code sees the CLI installation.
+4. In Copilot CLI, test session-local loading with `--plugin-dir`, then Git installation plus
+   `list`, `update`, `disable`, `enable`, and `uninstall`; confirm VS Code sees the installation.
 5. In Claude Code, test `--plugin-dir`, self-hosted marketplace add/install, `/reload-plugins`, scoped
    skill/agent invocation, update, disable, and uninstall.
 6. Run the disposable-repository matrix independently on all three clients, including negative tests

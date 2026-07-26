@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "validationCommands": [],
+  "protectedPaths": [
+    ".env",
+    ".env.*",
+    ".startbuilding/runs/"
+  ],
+  "branchPrefix": "startbuilding/",
+  "requirePlanApproval": true,
+  "requireReviewApproval": true
+}
