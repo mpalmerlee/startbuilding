@@ -2,9 +2,11 @@
 
 ## Product boundary
 
-StartBuilding defines a human-reviewed software delivery method. The coding-agent host supplies
+StartBuilding is a framework for human-reviewed agentic graphs. The coding-agent host supplies
 model execution and tools, the target repository supplies architecture and validation policy, Git
-supplies isolation and source history, and local files supply resumable workflow state.
+supplies isolation and source history, and local files supply resumable workflow state. The
+`deliver` graph applies this framework to software changes; the `research` graph applies it to
+investigation and recommendation.
 
 StartBuilding does not provide a queue, background worker, database, scheduler, multi-user approval
 system, remote execution service, or project-management UI.
@@ -17,6 +19,7 @@ plugin.json                         Copilot and VS Code manifest
 .claude-plugin/plugin.json          Claude Code manifest
 .claude-plugin/marketplace.json     Self-hosted Claude catalog
 skills/deliver/                     Shared workflow and artifact contract
+skills/research/                    Shared research workflow and artifact contract
 agents/                             Shared cross-client agent definitions
 scripts/validate.sh                 Static validation entry point
 ```
@@ -43,6 +46,22 @@ The Coordinator is also available as an explicit agent entry point. Specialists 
 normal Copilot picker but remain model-invocable. Claude plugin agents use scoped display names such
 as `startbuilding:startbuilding-implementer`.
 
+## Research components
+
+The `research` skill is a second, independent graph. It runs in the parent context, owns its own
+run artifacts, and invokes one read-only specialist at a time.
+
+| Role | Responsibility | Copilot tools | Claude tools |
+| --- | --- | --- | --- |
+| Research Coordinator | State and delegation | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
+| Researcher | Evidence gathering | read, search | Read, Glob, Grep |
+| Skeptic | Adversarial critique | read, search | Read, Glob, Grep |
+| Merger | Recommendation synthesis | read, search | Read, Glob, Grep |
+
+Every research specialist is read-only in both vocabularies. The Research Coordinator's `Agent`
+allowlist names only the research specialists, keeping the two graphs isolated. Both skills share
+the same manifests, static validator, and `.startbuilding/runs/` artifact conventions.
+
 ## State machine
 
 ```text
@@ -61,6 +80,20 @@ that creates either the plan or review stops before the gated work.
 Plan approval records the current plan artifact, UTC time, and short approval text. Plans are never
 overwritten; a revision creates a suffixed artifact and changes `currentPlan`, invalidating prior
 approval. Delivery confirmation is an action request and is not stored as an approval record.
+
+The `research` graph uses its own, independent state machine:
+
+```text
+intake
+  -> researching
+  -> critiquing
+  -> synthesizing
+  -> recommendation_review
+  -> researching | completed
+```
+
+The transition out of `recommendation_review` requires an explicit human response. Revision returns
+to the specific stage that needs to repeat rather than restarting the whole run.
 
 ## Delivery scope
 

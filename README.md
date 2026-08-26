@@ -1,16 +1,21 @@
 # StartBuilding
 
-StartBuilding is a human-in-the-loop software delivery plugin for VS Code, GitHub Copilot CLI, and
-Claude Code. Give it a work request and focused agents plan the change, implement it, review it, and
-prepare a pull request without spending implementation tokens before plan approval or performing
-Git delivery before you ask.
+StartBuilding is a plugin framework for human-in-the-loop agentic graphs of specialist agents in
+VS Code, GitHub Copilot CLI, and Claude Code. Each graph is a resumable, file-backed workflow with
+named roles, least-privilege tools, and explicit human gates. StartBuilding currently ships two
+skill graphs:
+
+- `deliver`: plans a change, implements it, reviews it, and prepares a pull request without
+  spending implementation tokens before plan approval or performing Git delivery before you ask.
+- `research`: investigates a technical question, gathers and critiques evidence, and synthesizes a
+  recommendation for your review.
 
 StartBuilding uses the coding-agent host, Git, and local Markdown and JSON artifacts. It does not
 run a background service, database, scheduler, or separate orchestration UI.
 
 ## How it works
 
-StartBuilding coordinates five focused roles:
+StartBuilding coordinates the `deliver` graph's five focused roles:
 
 - The **Coordinator** owns workflow state and delegates each stage.
 - The **Planner** researches the repository and writes a concrete implementation plan. It cannot
@@ -39,6 +44,38 @@ The delivery workflow is:
 
 If a plan changes, its approval is invalidated. If review finds changes are needed, the workflow
 stops for human direction instead of silently expanding the approved scope.
+
+## How research works
+
+StartBuilding also coordinates a separate, read-only research graph with four roles:
+
+- The **Research Coordinator** owns workflow state and delegates each stage. It is the only role
+  that writes `.startbuilding/runs/` artifacts for a research run.
+- The **Researcher** gathers evidence and documents findings. It cannot edit files or run commands.
+- The **Skeptic** adversarially critiques the findings, challenging assumptions and surfacing risks
+  and evidence gaps. It cannot edit files or run commands.
+- The **Merger** synthesizes the findings and critique into a structured recommendation. It cannot
+  edit files or run commands.
+
+The research workflow is:
+
+```text
+intake -> researching -> critiquing -> synthesizing -> recommendation_review -> researching | completed
+```
+
+Each run is stored locally under:
+
+```text
+.startbuilding/runs/<work-id>/
+|-- request.md
+|-- findings.md
+|-- critique.md
+|-- recommendation.md
+`-- state.json
+```
+
+StartBuilding stops at `recommendation_review` and presents the recommendation. Continuing to
+`completed` or back to `researching` requires a later explicit human response.
 
 ## Durable workflow state
 
@@ -148,6 +185,15 @@ To resume in a later session, name the run directory and the action you want tak
 ```
 
 When more than one unfinished run exists, StartBuilding asks you to select one rather than guessing.
+
+Invoke the research skill with a focused investigation request:
+
+```text
+/startbuilding:research Investigate whether we should replace polling with webhooks for order status updates
+```
+
+StartBuilding creates the run artifacts, delegates evidence gathering, critique, and synthesis, and
+stops with the recommendation ready for your review.
 
 ## Safety boundaries
 
