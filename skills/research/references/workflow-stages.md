@@ -8,7 +8,7 @@ intake
   -> critiquing
   -> synthesizing
   -> recommendation_review
-  -> revising | completed
+   -> researching | completed
 ```
 
 Update `state.json` only after the corresponding artifact has been written successfully.

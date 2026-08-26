@@ -10,7 +10,7 @@ All notable changes to StartBuilding are documented in this file.
   `deliver` and `research` as its two current skill graphs.
 - Added the `/startbuilding:research` skill graph: a read-only investigation and recommendation
   workflow with its own coordinator, artifact contract, and workflow stages
-  (`intake -> researching -> critiquing -> synthesizing -> recommendation_review -> revising | completed`).
+  (`intake -> researching -> critiquing -> synthesizing -> recommendation_review -> researching | completed`).
 - Added four new shared agents: `startbuilding-research-coordinator`, `startbuilding-researcher`,
   `startbuilding-skeptic`, and `startbuilding-merger`. The three specialists are strictly read-only
   in both Copilot and Claude vocabularies.

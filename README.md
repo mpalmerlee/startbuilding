@@ -60,7 +60,7 @@ StartBuilding also coordinates a separate, read-only research graph with four ro
 The research workflow is:
 
 ```text
-intake -> researching -> critiquing -> synthesizing -> recommendation_review -> revising | completed
+intake -> researching -> critiquing -> synthesizing -> recommendation_review -> researching | completed
 ```
 
 Each run is stored locally under:

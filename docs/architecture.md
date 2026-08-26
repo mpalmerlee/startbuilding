@@ -89,14 +89,11 @@ intake
   -> critiquing
   -> synthesizing
   -> recommendation_review
-  -> revising | completed
+  -> researching | completed
 ```
 
 The transition out of `recommendation_review` requires an explicit human response. Revision returns
 to the specific stage that needs to repeat rather than restarting the whole run.
-
-For background design context on both graphs, see
-[docs/agentic-graph-engineering-vision-and-research-skill.md](./agentic-graph-engineering-vision-and-research-skill.md).
 
 ## Delivery scope
 
