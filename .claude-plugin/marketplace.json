@@ -5,13 +5,13 @@
   },
   "metadata": {
     "description": "StartBuilding plugin releases",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "startbuilding",
       "source": "./",
-      "description": "Human-reviewed software delivery with focused coding agents"
+      "description": "Human-reviewed agentic graphs for software delivery and research"
     }
   ]
 }

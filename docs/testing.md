@@ -31,13 +31,16 @@ project file.
    copilot plugin install /absolute/path/to/startbuilding
    ```
 
-3. Reload the VS Code window. Open **Chat: Open Customizations** and confirm the `deliver` skill and
-   exactly five StartBuilding agents have no diagnostics or duplicate variants.
+3. Reload the VS Code window. Open **Chat: Open Customizations** and confirm the `deliver` and
+   `research` skills and exactly nine StartBuilding agents have no diagnostics or duplicate
+   variants.
 4. Confirm every agent source resolves through the shared `agents/` directory.
 5. Invoke the Planner as a subagent and confirm it receives workspace read and file-search tools.
 6. Invoke the Implementer as a subagent and confirm it receives filesystem, edit, and shell tools.
 7. Confirm `/startbuilding:deliver` appears and the Coordinator can invoke each exact specialist.
-8. Disable the plugin and confirm its components disappear; enable it and confirm they return.
+8. Confirm `/startbuilding:research` appears and the Research Coordinator can invoke the
+   Researcher, Skeptic, and Merger, each receiving only workspace read and file-search tools.
+9. Disable the plugin and confirm its components disappear; enable it and confirm they return.
 
 ## Copilot CLI local test
 
@@ -70,10 +73,12 @@ claude plugin validate . --strict
 claude --plugin-dir /absolute/path/to/startbuilding
 ```
 
-Inside Claude Code, confirm `/startbuilding:deliver` is available and plugin agents appear under
-their scoped names, such as `startbuilding:startbuilding-implementer`. Confirm Planner gets
-only `Read`, `Glob`, and `Grep`; Implementer gets `Read`, `Glob`, `Grep`, `Edit`, `Write`, and `Bash`;
-and Coordinator gets `Read`, `Write`, `Edit`, `Bash`, and the scoped `Agent` allowlist. Use
+Inside Claude Code, confirm `/startbuilding:deliver` and `/startbuilding:research` are available and
+plugin agents appear under their scoped names, such as `startbuilding:startbuilding-implementer`.
+Confirm Planner gets only `Read`, `Glob`, and `Grep`; Implementer gets `Read`, `Glob`, `Grep`,
+`Edit`, `Write`, and `Bash`; and Coordinator gets `Read`, `Write`, `Edit`, `Bash`, and the scoped
+`Agent` allowlist. Confirm the Researcher, Skeptic, and Merger each get only `Read`, `Glob`, and
+`Grep`, and that the Research Coordinator's `Agent` allowlist names only those three. Use
 `/reload-plugins` after changing components.
 
 Test persistent installation through the self-hosted catalog:
@@ -125,6 +130,13 @@ Run the same work request independently in VS Code, Copilot CLI, and Claude Code
 | Explicit delivery request | Stages only reviewed paths, commits, pushes, and creates a PR |
 | New chat session | Resumes the named run from `state.json` and current artifacts |
 | Multiple active runs | Lists candidates and asks instead of guessing |
+| New research request | Creates `request.md` and valid `state.json` at stage `intake` |
+| Researching | Uses the native Researcher, writes `findings.md`, and advances to `critiquing` |
+| Critiquing | Uses the native Skeptic, writes `critique.md`, and advances to `synthesizing` |
+| Synthesizing | Uses the native Merger, writes `recommendation.md`, and stops at `recommendation_review` |
+| No human response at recommendation review | Makes no further stage transition |
+| Requested revision | Repeats the needed stage, writes a suffixed artifact, and stops again at `recommendation_review` |
+| Accepted recommendation | Sets stage `completed` and stops |
 
 Inspect Git status, the staged diff, commit contents, remote branch, pull-request body, and run state
 after each applicable scenario.

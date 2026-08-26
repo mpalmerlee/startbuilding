@@ -6,6 +6,61 @@ import re
 import sys
 from pathlib import Path
 
+SKILLS = {
+    "deliver": {
+        "markers": (
+            "./references/workflow-stages.md",
+            "./references/artifact-contract.md",
+            "./references/project-configuration.md",
+            "./assets/project.json",
+            "startbuilding-planner",
+            "startbuilding:startbuilding-planner",
+        ),
+    },
+    "research": {
+        "markers": (
+            "./references/workflow-stages.md",
+            "./references/artifact-contract.md",
+            "./assets/research-project.json",
+            "startbuilding-researcher",
+            "startbuilding:startbuilding-researcher",
+        ),
+    },
+}
+
+GRAPHS = {
+    "deliver": {
+        "roles": ("coordinator", "planner", "implementer", "reviewer", "committer"),
+        "tools": {
+            "coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-planner, startbuilding:startbuilding-implementer, startbuilding:startbuilding-reviewer, startbuilding:startbuilding-committer)"]',
+            "planner": "[read, search, Read, ToolSearch, Glob, Grep]",
+            "implementer": "[read, search, edit, execute, Read, ToolSearch, Glob, Grep, Edit, Write, Bash]",
+            "reviewer": "[read, search, execute, Read, ToolSearch, Glob, Grep, Bash]",
+            "committer": "[read, execute, Read, ToolSearch, Glob, Grep, Bash]",
+        },
+        "contract_markers": {
+            "planner": ("Status: awaiting approval",),
+            "implementer": ("planApproval.artifact", "Status: ready for review"),
+            "reviewer": ("Verdict: changes requested", "Verdict: ready for delivery"),
+            "committer": ("gh auth status", "git add -A", "Status: delivered"),
+        },
+    },
+    "research": {
+        "roles": ("research-coordinator", "researcher", "skeptic", "merger"),
+        "tools": {
+            "research-coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-researcher, startbuilding:startbuilding-skeptic, startbuilding:startbuilding-merger)"]',
+            "researcher": "[read, search, Read, ToolSearch, Glob, Grep]",
+            "skeptic": "[read, search, Read, ToolSearch, Glob, Grep]",
+            "merger": "[read, search, Read, ToolSearch, Glob, Grep]",
+        },
+        "contract_markers": {
+            "researcher": ("Status: findings ready",),
+            "skeptic": ("Status: critique ready",),
+            "merger": ("Status: recommendation ready",),
+        },
+    },
+}
+
 
 class Validation:
     def __init__(self, root: Path) -> None:
@@ -97,21 +152,20 @@ class Validation:
             self.fail("Marketplace and plugin versions differ")
 
     def validate_skill(self) -> None:
-        fields, body = self.read_frontmatter("skills/deliver/SKILL.md")
-        if fields.get("name") != "deliver":
-            self.fail("Skill name must be deliver")
-        if not fields.get("description"):
-            self.fail("Skill description is required")
-        for marker in (
-            "./references/workflow-stages.md",
-            "./references/artifact-contract.md",
-            "./references/project-configuration.md",
-            "./assets/project.json",
-            "startbuilding-planner",
-            "startbuilding:startbuilding-planner",
-        ):
-            if marker not in body:
-                self.fail(f"Skill is missing contract marker: {marker}")
+        skill_dir = self.root / "skills"
+        found_skills = sorted(p.name for p in skill_dir.iterdir() if p.is_dir()) if skill_dir.is_dir() else []
+        if found_skills != sorted(SKILLS):
+            self.fail(f"Expected skill directories {sorted(SKILLS)}, found {found_skills}")
+
+        for skill_name, spec in SKILLS.items():
+            fields, body = self.read_frontmatter(f"skills/{skill_name}/SKILL.md")
+            if fields.get("name") != skill_name:
+                self.fail(f"Skill name must be {skill_name}")
+            if not fields.get("description"):
+                self.fail(f"Skill description is required for {skill_name}")
+            for marker in spec["markers"]:
+                if marker not in body:
+                    self.fail(f"Skill {skill_name} is missing contract marker: {marker}")
 
         config = self.read_json("skills/deliver/assets/project.json")
         if config.get("version") != 1:
@@ -122,57 +176,51 @@ class Validation:
         if not isinstance(protected, list) or ".startbuilding/runs/" not in protected:
             self.fail("Run artifacts must be protected")
 
+        research_config = self.read_json("skills/research/assets/research-project.json")
+        if research_config.get("version") != 1:
+            self.fail("Research project configuration version must be 1")
+
     def validate_agents(self) -> None:
-        roles = ("coordinator", "planner", "implementer", "reviewer", "committer")
         agent_dir = self.root / "agents"
         agent_files = sorted(agent_dir.glob("*.agent.md")) if agent_dir.is_dir() else []
-        if len(agent_files) != 5:
-            self.fail("Expected exactly five shared agents")
+        expected_total = sum(len(graph["roles"]) for graph in GRAPHS.values())
+        if len(agent_files) != expected_total:
+            self.fail(f"Expected exactly {expected_total} shared agents, matching the known graphs")
 
-        expected_copilot_tools = {
-            "coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-planner, startbuilding:startbuilding-implementer, startbuilding:startbuilding-reviewer, startbuilding:startbuilding-committer)"]',
-            "planner": "[read, search, Read, ToolSearch, Glob, Grep]",
-            "implementer": "[read, search, edit, execute, Read, ToolSearch, Glob, Grep, Edit, Write, Bash]",
-            "reviewer": "[read, search, execute, Read, ToolSearch, Glob, Grep, Bash]",
-            "committer": "[read, execute, Read, ToolSearch, Glob, Grep, Bash]",
-        }
-        agent_names = {role: f"startbuilding-{role}" for role in roles}
+        for graph in GRAPHS.values():
+            roles = graph["roles"]
+            coordinator_role = roles[0]
+            agent_names = {role: f"startbuilding-{role}" for role in roles}
 
-        for role in roles:
-            agent_path = f"agents/startbuilding-{role}.agent.md"
-            agent_fields, _ = self.read_frontmatter(agent_path)
+            for role in roles:
+                agent_path = f"agents/startbuilding-{role}.agent.md"
+                agent_fields, _ = self.read_frontmatter(agent_path)
 
-            if agent_fields.get("name") != agent_names[role]:
-                self.fail(f"Invalid shared agent name for {role}")
-            if agent_fields.get("tools") != expected_copilot_tools[role]:
-                self.fail(f"Invalid shared tools for {role}")
+                if agent_fields.get("name") != agent_names[role]:
+                    self.fail(f"Invalid shared agent name for {role}")
+                if agent_fields.get("tools") != graph["tools"][role]:
+                    self.fail(f"Invalid shared tools for {role}")
 
-            if role != "coordinator":
-                if agent_fields.get("agents") != "[]":
-                    self.fail(f"Shared {role} must prevent subagent use")
-                if agent_fields.get("user-invocable") != "false":
-                    self.fail(f"Shared {role} must be hidden from the normal picker")
+                if role != coordinator_role:
+                    if agent_fields.get("agents") != "[]":
+                        self.fail(f"Shared {role} must prevent subagent use")
+                    if agent_fields.get("user-invocable") != "false":
+                        self.fail(f"Shared {role} must be hidden from the normal picker")
 
-        coordinator = self.require_file(
-            "agents/startbuilding-coordinator.agent.md"
-        ).read_text(encoding="utf-8")
-        for role in roles[1:]:
-            if agent_names[role] not in coordinator:
-                self.fail(f"Shared coordinator is missing {agent_names[role]}")
-
-        contract_markers = {
-            "planner": ("Status: awaiting approval",),
-            "implementer": ("planApproval.artifact", "Status: ready for review"),
-            "reviewer": ("Verdict: changes requested", "Verdict: ready for delivery"),
-            "committer": ("gh auth status", "git add -A", "Status: delivered"),
-        }
-        for role, markers in contract_markers.items():
-            text = self.require_file(
-                f"agents/startbuilding-{role}.agent.md"
+            coordinator_text = self.require_file(
+                f"agents/startbuilding-{coordinator_role}.agent.md"
             ).read_text(encoding="utf-8")
-            for marker in markers:
-                if marker not in text:
-                    self.fail(f"{role} is missing contract marker: {marker}")
+            for role in roles[1:]:
+                if agent_names[role] not in coordinator_text:
+                    self.fail(f"Shared {coordinator_role} is missing {agent_names[role]}")
+
+            for role, markers in graph["contract_markers"].items():
+                text = self.require_file(
+                    f"agents/startbuilding-{role}.agent.md"
+                ).read_text(encoding="utf-8")
+                for marker in markers:
+                    if marker not in text:
+                        self.fail(f"{role} is missing contract marker: {marker}")
 
     def validate_markdown_links(self) -> None:
         pattern = re.compile(r"\[[^]]+\]\(([^)]+)\)")
@@ -205,6 +253,7 @@ class Validation:
             readme_text = readme.read_text(encoding="utf-8")
             for marker in (
                 "/startbuilding:deliver",
+                "/startbuilding:research",
                 "copilot plugin install mpalmerlee/startbuilding",
                 "claude plugin marketplace add mpalmerlee/startbuilding",
                 "VS Code also discovers plugins installed by Copilot CLI",

@@ -2,6 +2,21 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.3.0 - 2026-08-26
+
+### Added
+
+- Reframed StartBuilding as a plugin framework for human-in-the-loop agentic graphs, with
+  `deliver` and `research` as its two current skill graphs.
+- Added the `/startbuilding:research` skill graph: a read-only investigation and recommendation
+  workflow with its own coordinator, artifact contract, and workflow stages
+  (`intake -> researching -> critiquing -> synthesizing -> recommendation_review -> revising | completed`).
+- Added four new shared agents: `startbuilding-research-coordinator`, `startbuilding-researcher`,
+  `startbuilding-skeptic`, and `startbuilding-merger`. The three specialists are strictly read-only
+  in both Copilot and Claude vocabularies.
+- Generalized `scripts/validate.py` to validate every skill graph and its full agent inventory
+  instead of a single hardcoded graph.
+
 ## 0.2.0 - 2026-07-26
 
 ### Changed
