@@ -49,8 +49,8 @@ GRAPHS = {
         "roles": ("research-coordinator", "researcher", "skeptic", "merger"),
         "tools": {
             "research-coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-researcher, startbuilding:startbuilding-skeptic, startbuilding:startbuilding-merger)"]',
-            "researcher": "[read, search, Read, ToolSearch, Glob, Grep]",
-            "skeptic": "[read, search, Read, ToolSearch, Glob, Grep]",
+            "researcher": "[read, search, fetch, Read, ToolSearch, Glob, Grep, WebSearch, WebFetch]",
+            "skeptic": "[read, search, fetch, Read, ToolSearch, Glob, Grep, WebSearch, WebFetch]",
             "merger": "[read, search, Read, ToolSearch, Glob, Grep]",
         },
         "contract_markers": {

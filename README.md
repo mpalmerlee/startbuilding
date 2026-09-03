@@ -51,9 +51,11 @@ StartBuilding also coordinates a separate, read-only research graph with four ro
 
 - The **Research Coordinator** owns workflow state and delegates each stage. It is the only role
   that writes `.startbuilding/runs/` artifacts for a research run.
-- The **Researcher** gathers evidence and documents findings. It cannot edit files or run commands.
+- The **Researcher** gathers evidence and documents findings, from the repository and from external
+  documentation on the web. It cites every source. It cannot edit files or run commands.
 - The **Skeptic** adversarially critiques the findings, challenging assumptions and surfacing risks
-  and evidence gaps. It cannot edit files or run commands.
+  and evidence gaps. It can fetch the cited external sources to verify them rather than trusting
+  them. It cannot edit files or run commands.
 - The **Merger** synthesizes the findings and critique into a structured recommendation. It cannot
   edit files or run commands.
 

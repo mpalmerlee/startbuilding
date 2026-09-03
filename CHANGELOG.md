@@ -2,6 +2,16 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## Unreleased
+
+### Changed
+
+- Gave the research Researcher and Skeptic web access (`fetch` for Copilot, `WebSearch` and
+  `WebFetch` for Claude), because much of the documentation a research question depends on is
+  external. The Researcher now cites each external source with its URL and retrieval date, and the
+  Skeptic verifies those citations instead of trusting them. Both remain unable to edit files or run
+  commands, and the Merger remains local-only.
+
 ## 0.3.0 - 2026-08-26
 
 ### Added
