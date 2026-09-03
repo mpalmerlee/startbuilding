@@ -54,12 +54,17 @@ run artifacts, and invokes one read-only specialist at a time.
 | Role | Responsibility | Copilot tools | Claude tools |
 | --- | --- | --- | --- |
 | Research Coordinator | State and delegation | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
-| Researcher | Evidence gathering | read, search | Read, Glob, Grep |
-| Skeptic | Adversarial critique | read, search | Read, Glob, Grep |
+| Researcher | Evidence gathering | read, search, fetch | Read, Glob, Grep, WebSearch, WebFetch |
+| Skeptic | Adversarial critique | read, search, fetch | Read, Glob, Grep, WebSearch, WebFetch |
 | Merger | Recommendation synthesis | read, search | Read, Glob, Grep |
 
-Every research specialist is read-only in both vocabularies. The Research Coordinator's `Agent`
-allowlist names only the research specialists, keeping the two graphs isolated. Both skills share
+Every research specialist is read-only in both vocabularies: none can edit files or run commands.
+The Researcher and Skeptic additionally reach the network, because much of the documentation a
+research question depends on lives outside the repository. The Researcher fetches primary sources
+and cites them; the Skeptic verifies those citations instead of trusting them. Copilot supplies
+`fetch` but no built-in web search, so that host retrieves URLs without the search step. The Merger
+stays local and reasons only over the persisted findings and critique. The Research Coordinator's
+`Agent` allowlist names only the research specialists, keeping the two graphs isolated. Both skills share
 the same manifests, static validator, and `.startbuilding/runs/` artifact conventions.
 
 ## State machine

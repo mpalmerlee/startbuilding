@@ -39,7 +39,9 @@ project file.
 6. Invoke the Implementer as a subagent and confirm it receives filesystem, edit, and shell tools.
 7. Confirm `/startbuilding:deliver` appears and the Coordinator can invoke each exact specialist.
 8. Confirm `/startbuilding:research` appears and the Research Coordinator can invoke the
-   Researcher, Skeptic, and Merger, each receiving only workspace read and file-search tools.
+   Researcher, Skeptic, and Merger. Confirm the Merger receives only workspace read and
+   file-search tools, and that the Researcher and Skeptic receive those plus web fetch, with no
+   edit or shell tools for any of the three.
 9. Disable the plugin and confirm its components disappear; enable it and confirm they return.
 
 ## Copilot CLI local test

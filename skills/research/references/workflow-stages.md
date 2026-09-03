@@ -30,7 +30,8 @@ Record the research question, scope, and any constraints in `request.md`. Set st
 ## Researching
 
 Invoke the native Researcher with the request, run path, repository instructions, and prior
-findings when revising. The Researcher must not edit or execute.
+findings when revising. The Researcher must not edit or execute. It may search and fetch external
+documentation, and must cite each external source with its URL and retrieval date.
 
 Persist its exact result to the next findings artifact, set `currentFindings`, and set stage
 `critiquing`.
@@ -38,7 +39,7 @@ Persist its exact result to the next findings artifact, set `currentFindings`, a
 ## Critiquing
 
 Invoke the native Skeptic with the request and `currentFindings`. The Skeptic must not edit or
-execute.
+execute. It may fetch the external sources the findings cite in order to verify them.
 
 Persist its exact result to the next critique artifact, set `currentCritique`, and set stage
 `synthesizing`.
