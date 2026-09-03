@@ -2,7 +2,7 @@
   "name": "startbuilding",
   "displayName": "StartBuilding",
   "description": "Human-reviewed agentic graphs for software delivery and research with focused coding agents.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": {
     "name": "Matt Palmerlee"
   },

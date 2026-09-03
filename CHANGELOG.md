@@ -2,7 +2,7 @@
 
 All notable changes to StartBuilding are documented in this file.
 
-## Unreleased
+## 0.3.1 - 2026-09-02
 
 ### Changed
 
