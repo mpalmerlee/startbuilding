@@ -26,6 +26,22 @@ SKILLS = {
             "startbuilding:startbuilding-researcher",
         ),
     },
+    "pr-review": {
+        "markers": (
+            "./references/workflow-stages.md",
+            "./references/artifact-contract.md",
+            "startbuilding-pr-reviewer",
+            "startbuilding:startbuilding-pr-reviewer",
+        ),
+    },
+    "pr-resolve": {
+        "markers": (
+            "./references/workflow-stages.md",
+            "./references/artifact-contract.md",
+            "startbuilding-pr-resolve-planner",
+            "startbuilding:startbuilding-pr-resolve-planner",
+        ),
+    },
 }
 
 GRAPHS = {
@@ -57,6 +73,37 @@ GRAPHS = {
             "researcher": ("Status: findings ready",),
             "skeptic": ("Status: critique ready",),
             "merger": ("Status: recommendation ready",),
+        },
+    },
+    "pr-review": {
+        "roles": ("pr-review-coordinator", "pr-reviewer", "pr-commenter"),
+        "tools": {
+            "pr-review-coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-pr-reviewer, startbuilding:startbuilding-pr-commenter)"]',
+            "pr-reviewer": "[read, search, execute, Read, ToolSearch, Glob, Grep, Bash]",
+            "pr-commenter": "[read, execute, Read, ToolSearch, Glob, Grep, Bash]",
+        },
+        "contract_markers": {
+            "pr-reviewer": ("Status: findings ready",),
+            "pr-commenter": ("gh auth status", "REQUEST_CHANGES", "Status: posted"),
+        },
+    },
+    "pr-resolve": {
+        "roles": (
+            "pr-resolve-coordinator",
+            "pr-resolve-planner",
+            "pr-resolve-implementer",
+            "pr-resolve-committer",
+        ),
+        "tools": {
+            "pr-resolve-coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-pr-resolve-planner, startbuilding:startbuilding-pr-resolve-implementer, startbuilding:startbuilding-pr-resolve-committer)"]',
+            "pr-resolve-planner": "[read, search, execute, Read, ToolSearch, Glob, Grep, Bash]",
+            "pr-resolve-implementer": "[read, search, edit, execute, Read, ToolSearch, Glob, Grep, Edit, Write, Bash]",
+            "pr-resolve-committer": "[read, execute, Read, ToolSearch, Glob, Grep, Bash]",
+        },
+        "contract_markers": {
+            "pr-resolve-planner": ("Status: awaiting approval",),
+            "pr-resolve-implementer": ("planApproval.artifact", "Status: ready for delivery"),
+            "pr-resolve-committer": ("gh auth status", "git add -A", "Status: delivered"),
         },
     },
 }

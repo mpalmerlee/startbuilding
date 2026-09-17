@@ -6,7 +6,8 @@ StartBuilding is a framework for human-reviewed agentic graphs. The coding-agent
 model execution and tools, the target repository supplies architecture and validation policy, Git
 supplies isolation and source history, and local files supply resumable workflow state. The
 `deliver` graph applies this framework to software changes; the `research` graph applies it to
-investigation and recommendation.
+investigation and recommendation; the `pr-review` and `pr-resolve` graphs apply it to an already
+open pull request, using `gh` as the interface to GitHub.
 
 StartBuilding does not provide a queue, background worker, database, scheduler, multi-user approval
 system, remote execution service, or project-management UI.
@@ -20,6 +21,8 @@ plugin.json                         Copilot and VS Code manifest
 .claude-plugin/marketplace.json     Self-hosted Claude catalog
 skills/deliver/                     Shared workflow and artifact contract
 skills/research/                    Shared research workflow and artifact contract
+skills/pr-review/                   Shared PR review workflow and artifact contract
+skills/pr-resolve/                  Shared PR feedback resolution workflow and artifact contract
 agents/                             Shared cross-client agent definitions
 scripts/validate.sh                 Static validation entry point
 ```
@@ -67,6 +70,47 @@ stays local and reasons only over the persisted findings and critique. The Resea
 `Agent` allowlist names only the research specialists, keeping the two graphs isolated. Both skills share
 the same manifests, static validator, and `.startbuilding/runs/` artifact conventions.
 
+## PR review components
+
+The `pr-review` skill is a third, independent graph. It runs in the parent context, owns its own
+run artifacts derived from the pull request number for the current branch, and invokes one
+specialist at a time.
+
+| Role | Responsibility | Copilot tools | Claude tools |
+| --- | --- | --- | --- |
+| PR Review Coordinator | State and delegation | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
+| Reviewer | Diff review, dedup against existing comments | read, search, execute | Read, Glob, Grep, Bash |
+| Commenter | Posts approved comments with `gh` | read, execute | Read, Glob, Grep, Bash |
+
+The Reviewer is read-only even though it reaches `Bash`: its instructions restrict it to read-only
+`gh` and `git diff` commands and forbid any command that comments, reviews, labels, merges, or
+pushes. Only the Commenter may take that mutating action, and only after an explicit human
+approval names which findings to post. The Commenter never submits an `APPROVE` or
+`REQUEST_CHANGES` review event, so `pr-review` can never change a pull request's approval state.
+
+## PR resolve components
+
+The `pr-resolve` skill is a fourth, independent graph, structured like `deliver` but scoped to an
+already open pull request's feedback instead of a fresh work request.
+
+| Role | Responsibility | Copilot tools | Claude tools |
+| --- | --- | --- | --- |
+| PR Resolve Coordinator | State and delegation | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
+| Planner | Catalogs every PR comment, categorizes it, and plans fixes | read, search, execute | Read, Glob, Grep, Bash |
+| Implementer | Approved edits and validation | read, search, edit, execute | Read, Glob, Grep, Edit, Write, Bash |
+| Committer | Grouped commits, push, and PR replies | read, execute | Read, Glob, Grep, Bash |
+
+`pr-resolve` deliberately has no independent-review role: the human plan-approval gate is the only
+gate before implementation, and the Committer delivers directly after implementation. Each
+catalogued comment gets exactly one resolution recorded in the plan (fix now, reply-only, or no
+action), and the Committer's replies must match: a commit reference for a fix, the plan's recorded
+reasoning for an explicit no-fix decision, or no reply at all for a pure observation.
+
+Both `pr-review` and `pr-resolve` are isolated from `deliver` and `research` and from each other,
+following the same isolation principle as the research graph: each Coordinator's `Agent` allowlist
+names only its own graph's specialists, so a mutating role from one graph can never be invoked as a
+delegate of another.
+
 ## State machine
 
 ```text
@@ -100,6 +144,37 @@ intake
 The transition out of `recommendation_review` requires an explicit human response. Revision returns
 to the specific stage that needs to repeat rather than restarting the whole run.
 
+The `pr-review` graph uses its own, independent state machine:
+
+```text
+intake
+  -> reviewing
+  -> findings_review
+  -> posting
+  -> posted | posting_blocked
+  -> reviewing (revise findings)
+```
+
+The transition out of `findings_review` requires an explicit human approval naming which findings
+to post. Before posting, the workflow re-checks the pull request's head SHA against the SHA
+recorded when the findings were produced, and stops instead of posting against a moved head.
+
+The `pr-resolve` graph uses its own, independent state machine:
+
+```text
+intake
+  -> cataloging
+  -> plan_review
+  -> implementation
+  -> implementation_blocked | delivery
+  -> delivered | delivery_blocked
+```
+
+The transition out of `plan_review` requires explicit human approval of the current plan, recorded
+the same way as `deliver`'s plan approval. There is no independent-review stage: implementation
+transitions directly to delivery, which both delivers the approved changes and replies to the
+pull request's comments.
+
 ## Delivery scope
 
 The Implementer reports repository-relative `implementationPaths`. The Reviewer examines the whole
@@ -110,11 +185,22 @@ This design allows unrelated pre-existing changes to remain in the working tree 
 including them in the pull request. Ambiguous, protected, secret-bearing, or unreviewed paths block
 delivery.
 
+`pr-resolve` applies the same staging discipline per commit group instead of once at the end: the
+Committer stages and commits each of the plan's groups separately rather than staging all changes
+together, then pushes once every group has landed.
+
 ## Trust model
 
 The primary controls are native tool allowlists, isolated specialist contexts, current-plan human
 approval, explicit delivery confirmation, and explicit Git path staging. Instructions reinforce
 those controls but do not replace them.
+
+`pr-review` and `pr-resolve` extend this model to GitHub mutation: both require `gh auth status` to
+succeed before any mutating call, and both restrict every mutating agent to plain comments and
+replies, never a review `APPROVE`/`REQUEST_CHANGES` event, a merge, a close, or an edit to the pull
+request's title, description, or labels. `pr-review` additionally re-checks the pull request's head
+SHA immediately before posting, so an inline comment can never be anchored to a diff position that
+a later push has invalidated.
 
 StartBuilding intentionally ships no hooks or executable plugin runtime. The only bundled
 executable is a contributor-facing static validator. Target-repository commands run through the
