@@ -11,7 +11,9 @@ claude plugin validate . --strict
 
 The repository validator checks manifest identity and version parity, component paths, skill links,
 project policy, the shared agent inventory, dual-vocabulary tool restrictions, coordinator
-allowlists, stale identifiers, ASCII text, trailing whitespace, and executable permissions.
+allowlists, stale identifiers, ASCII text, trailing whitespace, and executable permissions. It
+excludes `.startbuilding/runs/`, since that tree holds transient, gitignored workflow evidence
+rather than shipped plugin content.
 
 ## Prevent customization collisions
 

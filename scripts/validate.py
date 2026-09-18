@@ -117,6 +117,10 @@ class Validation:
     def fail(self, message: str) -> None:
         self.errors.append(message)
 
+    def is_transient_run_artifact(self, path: Path) -> bool:
+        parts = path.relative_to(self.root).parts
+        return parts[:2] == (".startbuilding", "runs")
+
     def require_file(self, relative_path: str) -> Path:
         path = self.root / relative_path
         if not path.is_file():
@@ -272,7 +276,7 @@ class Validation:
     def validate_markdown_links(self) -> None:
         pattern = re.compile(r"\[[^]]+\]\(([^)]+)\)")
         for path in self.root.rglob("*.md"):
-            if ".git" in path.parts:
+            if ".git" in path.parts or self.is_transient_run_artifact(path):
                 continue
             for target in pattern.findall(path.read_text(encoding="utf-8")):
                 if target.startswith(("http://", "https://", "#", "mailto:")):
@@ -336,6 +340,7 @@ class Validation:
             if (
                 not path.is_file()
                 or ".git" in path.parts
+                or self.is_transient_run_artifact(path)
                 or (path.suffix not in text_suffixes and not is_extensionless_text)
             ):
                 continue
