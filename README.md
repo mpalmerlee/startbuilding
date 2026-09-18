@@ -330,6 +330,14 @@ catalog and plan ready for your review before implementing anything.
   staged. The practical mitigation today is procedural: avoid editing a file a run is actively
   working on until it delivers. See [Known limitations](docs/architecture.md#known-limitations) in
   the architecture doc for the design tradeoff and the fix under consideration.
+- **The Coordinator's tool access is broader than its role.** Every Coordinator (`deliver`,
+  `research`, `pr-review`, `pr-resolve`) carries `Write`, `Edit`, and `Bash` alongside its `Agent`
+  allowlist, because orchestration legitimately needs to write run artifacts and run precondition
+  checks like `git status` or `gh auth status`. Nothing at the tool-restriction layer stops the
+  Coordinator from also using those same tools to edit source, commit, push, or post PR comments
+  itself instead of delegating to the specialist whose role that is - only its instructions say not
+  to. See [Known limitations](docs/architecture.md#known-limitations) in the architecture doc for
+  more detail.
 
 StartBuilding deliberately keeps orchestration local and visible. The repository remains the source
 of truth for architecture and validation, Git remains the source of truth for changes, and the

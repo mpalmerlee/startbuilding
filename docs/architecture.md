@@ -231,6 +231,21 @@ the existing pattern used for protected paths, secrets, and unreviewed paths (se
 scope" above) more closely than trying to separate hunks would, at the cost of being coarser:
 it would also block a same-file edit that does not actually overlap the approved hunks.
 
+Every Coordinator's native tool allowlist (`Write`, `Edit`, `Bash`, plus its `Agent` allowlist) is
+broader than its role. It legitimately needs `Write`/`Edit` to create and update run artifacts and
+`Bash` to run precondition checks such as `git status`, `git branch`, or `gh auth status`, but
+those same tools are also enough to edit source, commit, push, or post PR comments directly - the
+mutating actions that are supposed to belong only to a delegated specialist. "Own only
+orchestration... never perform specialist work" (see each Coordinator's instructions) is an
+enforced boundary for every *specialist* role, whose own tool list has no `Bash`/`Edit`/`Write` to
+misuse, but for the Coordinator itself it is a prose instruction, not a tool restriction.
+
+A real fix would mean either giving the Coordinator a narrower, artifact-only write mechanism plus
+a read-only-shaped `Bash` for precondition checks (so it has no path to source edits or mutating
+Git/`gh` commands at all), or accepting that the trust model relies on instruction-following at
+this one layer, same as the current design. No specific replacement tool exists yet; this is
+recorded as a known gap rather than a planned change.
+
 ## Versioning
 
 Releases use semantic versioning. The version must match in all three plugin manifests and the
