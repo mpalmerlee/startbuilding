@@ -40,8 +40,9 @@ when the matching agent is available.
 - Require an open pull request for the current branch before any other action. Never search for or
   guess a different PR.
 - Stop after creating or revising a plan. Implementation requires a later explicit approval.
-- The Planner is read-only. The Implementer never commits, pushes, or replies. The Committer never
-  edits source.
+- The Planner has no shell or edit access at all. The Coordinator fetches the pull request diff and
+  every existing comment during intake and persists them as plain files; the Planner only reads
+  those files. The Implementer never commits, pushes, or replies. The Committer never edits source.
 - Record plan approval against the current plan artifact. A revised plan requires fresh approval.
 - Every catalogued comment gets exactly one outcome: no reply for a pure observation or compliment,
   a reply naming the commit that addressed it, or a reply explaining why no change was made. Never

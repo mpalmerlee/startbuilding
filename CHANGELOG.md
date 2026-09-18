@@ -16,7 +16,7 @@ All notable changes to StartBuilding are documented in this file.
   needed fixes, implements them once approved, commits each planned group separately, pushes, and
   replies to every catalogued comment as appropriate
   (`intake -> cataloging -> plan_review -> implementation -> implementation_blocked | delivery -> delivered | delivery_blocked`).
-- Added six new shared agents: `startbuilding-pr-review-coordinator`, `startbuilding-pr-reviewer`,
+- Added new shared agents: `startbuilding-pr-review-coordinator`, `startbuilding-pr-reviewer`,
   `startbuilding-pr-commenter`, `startbuilding-pr-resolve-coordinator`,
   `startbuilding-pr-resolve-planner`, `startbuilding-pr-resolve-implementer`, and
   `startbuilding-pr-resolve-committer` (seven agents total across the two new graphs). Every

@@ -7,6 +7,9 @@ repository's `.gitignore` unless the team deliberately versions workflow evidenc
 ## Files
 
 - `request.md`: the pull request identity, URL, branch names, and head SHA at intake.
+- `diff.patch`: the pull request diff fetched at intake, exactly as the Planner reads it.
+- `existing-comments.md`: the existing-comment snapshot fetched at intake, exactly as the Planner
+  reads it.
 - `plan.md`: exact initial Planner output, including the comment catalog.
 - `implementation.md`: exact initial Implementer output.
 - `delivery.md`: exact Committer result.

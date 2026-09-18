@@ -28,13 +28,17 @@ Update `state.json` only after the corresponding artifact has been written succe
 ## Intake
 
 Record the pull request identity, URL, base and head branch names, and head SHA in `request.md`.
-Set stage `cataloging`.
+Fetch the pull request diff (`gh pr diff` or `git diff <base>...<head>`) and every existing comment
+on the pull request, including review-thread comments (resolved or not) and plain conversation
+comments, and persist both as plain files (`diff.patch` and `existing-comments.md`) in the run
+directory. The Planner has no shell access and reads only what is persisted here. Set stage
+`cataloging`.
 
 ## Cataloging
 
-Invoke the native Planner with the pull request diff, every existing comment (review-thread
-comments and plain conversation comments, resolved or not), repository instructions, and nearby
-tests. The Planner must not edit or execute mutating commands.
+Invoke the native Planner with the persisted diff, the persisted existing-comment snapshot,
+repository instructions, and nearby tests. The Planner has no tool access beyond reading files: it
+cannot edit, execute, or fetch anything itself.
 
 The Planner assigns a stable number to each comment or review thread, records its kind
 (`review-thread` or `issue-comment`), root comment ID or URL, file and line when it applies, author,

@@ -45,8 +45,9 @@ project file.
    file-search tools, and that the Researcher and Skeptic receive those plus web fetch, with no
    edit or shell tools for any of the three.
 9. Confirm `/startbuilding:pr-review` appears and the PR Review Coordinator can invoke the
-   Reviewer and Commenter. Confirm both receive shell access (for `gh`), but only the Commenter's
-   instructions permit a mutating `gh` call.
+   Reviewer and Commenter. Confirm the Reviewer receives only workspace read and file-search
+   tools, with no shell access at all, and that only the Commenter receives shell access (for
+   `gh`), restricted by its own instructions to a `COMMENT`-event review.
 10. Confirm `/startbuilding:pr-resolve` appears and the PR Resolve Coordinator can invoke the
     Planner, Implementer, and Committer, mirroring the `deliver` tool boundaries with no
     independent-review role.
@@ -91,11 +92,12 @@ only `Read`, `Glob`, and `Grep`; Implementer gets `Read`, `Glob`, `Grep`, `Edit`
 Confirm the Researcher, Skeptic, and Merger each get only `Read`, `Glob`, and `Grep`, and that the
 Research Coordinator's `Agent` allowlist names only those three.
 
-Confirm the PR Reviewer and PR Commenter each get `Read`, `Glob`, `Grep`, and `Bash`, and that the
-PR Review Coordinator's `Agent` allowlist names only those two. Confirm the PR Resolve Planner gets
-`Read`, `Glob`, `Grep`, and `Bash`; the PR Resolve Implementer additionally gets `Edit` and `Write`;
-the PR Resolve Committer gets `Read`, `Glob`, `Grep`, and `Bash`; and the PR Resolve Coordinator's
-`Agent` allowlist names only those three. Use `/reload-plugins` after changing components.
+Confirm the PR Reviewer gets only `Read`, `Glob`, and `Grep` (no `Bash`), the PR Commenter gets
+those plus `Bash`, and the PR Review Coordinator's `Agent` allowlist names only those two. Confirm
+the PR Resolve Planner gets only `Read`, `Glob`, and `Grep` (no `Bash`); the PR Resolve Implementer
+gets those plus `Edit`, `Write`, and `Bash`; the PR Resolve Committer gets `Read`, `Glob`, `Grep`,
+and `Bash`; and the PR Resolve Coordinator's `Agent` allowlist names only those three. Use
+`/reload-plugins` after changing components.
 
 Test persistent installation through the self-hosted catalog:
 

@@ -37,8 +37,9 @@ when the matching agent is available.
 
 - Require an open pull request for the current branch before any other action. Never search for or
   guess a different PR.
-- The Reviewer is read-only: it must not edit files, stage changes, or call any mutating `gh` or
-  Git command.
+- The Reviewer has no shell or edit access at all. The Coordinator fetches the pull request diff
+  and existing-comment snapshot during intake and persists them as plain files; the Reviewer only
+  reads those files.
 - Never report a finding that substantively repeats an existing PR comment or review thread,
   resolved or not.
 - Stop after findings are ready and again before posting. Posting requires a later, explicit human

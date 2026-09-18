@@ -79,7 +79,7 @@ GRAPHS = {
         "roles": ("pr-review-coordinator", "pr-reviewer", "pr-commenter"),
         "tools": {
             "pr-review-coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-pr-reviewer, startbuilding:startbuilding-pr-commenter)"]',
-            "pr-reviewer": "[read, search, execute, Read, ToolSearch, Glob, Grep, Bash]",
+            "pr-reviewer": "[read, search, Read, ToolSearch, Glob, Grep]",
             "pr-commenter": "[read, execute, Read, ToolSearch, Glob, Grep, Bash]",
         },
         "contract_markers": {
@@ -96,7 +96,7 @@ GRAPHS = {
         ),
         "tools": {
             "pr-resolve-coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-pr-resolve-planner, startbuilding:startbuilding-pr-resolve-implementer, startbuilding:startbuilding-pr-resolve-committer)"]',
-            "pr-resolve-planner": "[read, search, execute, Read, ToolSearch, Glob, Grep, Bash]",
+            "pr-resolve-planner": "[read, search, Read, ToolSearch, Glob, Grep]",
             "pr-resolve-implementer": "[read, search, edit, execute, Read, ToolSearch, Glob, Grep, Edit, Write, Bash]",
             "pr-resolve-committer": "[read, execute, Read, ToolSearch, Glob, Grep, Bash]",
         },

@@ -78,15 +78,18 @@ specialist at a time.
 
 | Role | Responsibility | Copilot tools | Claude tools |
 | --- | --- | --- | --- |
-| PR Review Coordinator | State and delegation | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
-| Reviewer | Diff review, dedup against existing comments | read, search, execute | Read, Glob, Grep, Bash |
+| PR Review Coordinator | State, delegation, and diff/comment fetching at intake | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
+| Reviewer | Diff review, dedup against existing comments | read, search | Read, Glob, Grep |
 | Commenter | Posts approved comments with `gh` | read, execute | Read, Glob, Grep, Bash |
 
-The Reviewer is read-only even though it reaches `Bash`: its instructions restrict it to read-only
-`gh` and `git diff` commands and forbid any command that comments, reviews, labels, merges, or
-pushes. Only the Commenter may take that mutating action, and only after an explicit human
-approval names which findings to post. The Commenter never submits an `APPROVE` or
-`REQUEST_CHANGES` review event, so `pr-review` can never change a pull request's approval state.
+The Reviewer has no `Bash` or edit access at all: the Coordinator fetches the pull request diff and
+the existing-comment snapshot during intake and persists them as plain files, and the Reviewer only
+reads those files. This closes a gap an earlier draft had - giving the Reviewer raw `Bash` to fetch
+`gh`/`git diff` itself, restricted only by a prose instruction, while it processes untrusted
+external content (arbitrary PR comment bodies). Only the Commenter may take a mutating action, and
+only after an explicit human approval names which findings to post. The Commenter never submits an
+`APPROVE` or `REQUEST_CHANGES` review event, so `pr-review` can never change a pull request's
+approval state.
 
 ## PR resolve components
 
@@ -95,10 +98,14 @@ already open pull request's feedback instead of a fresh work request.
 
 | Role | Responsibility | Copilot tools | Claude tools |
 | --- | --- | --- | --- |
-| PR Resolve Coordinator | State and delegation | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
-| Planner | Catalogs every PR comment, categorizes it, and plans fixes | read, search, execute | Read, Glob, Grep, Bash |
+| PR Resolve Coordinator | State, delegation, and diff/comment fetching at intake | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
+| Planner | Catalogs every PR comment, categorizes it, and plans fixes | read, search | Read, Glob, Grep |
 | Implementer | Approved edits and validation | read, search, edit, execute | Read, Glob, Grep, Edit, Write, Bash |
 | Committer | Grouped commits, push, and PR replies | read, execute | Read, Glob, Grep, Bash |
+
+Like the Reviewer, the Planner has no `Bash` or edit access at all: the Coordinator fetches the
+pull request diff and every existing comment during intake and persists them as plain files, and
+the Planner only reads those files.
 
 `pr-resolve` deliberately has no independent-review role: the human plan-approval gate is the only
 gate before implementation, and the Committer delivers directly after implementation. Each

@@ -6,8 +6,10 @@ repository's `.gitignore` unless the team deliberately versions workflow evidenc
 
 ## Files
 
-- `request.md`: the pull request identity, URL, branch names, head SHA at intake, and the
-  existing-comment snapshot.
+- `request.md`: the pull request identity, URL, branch names, and head SHA at intake.
+- `diff.patch`: the pull request diff fetched at intake, exactly as the Reviewer reads it.
+- `existing-comments.md`: the existing-comment snapshot fetched at intake, exactly as the Reviewer
+  reads it.
 - `findings.md`: exact initial Reviewer output.
 - `posted.md`: exact Commenter result.
 - `state.json`: machine-readable stage, pointers, approved posting scope, and posted comment IDs.

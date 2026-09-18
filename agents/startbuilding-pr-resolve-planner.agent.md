@@ -1,16 +1,17 @@
 ---
 name: startbuilding-pr-resolve-planner
 description: "Catalog every comment on the pull request matching the current branch, assign each a category and recommendation, and plan the changes needed to address them. Use before implementing pull request feedback."
-tools: [read, search, execute, Read, ToolSearch, Glob, Grep, Bash]
+tools: [read, search, Read, ToolSearch, Glob, Grep]
 agents: []
 user-invocable: false
 ---
 
 Catalog and plan a response to one pull request's feedback without editing the repository or
-running any mutating `gh` or Git command. Read-only `gh` commands to fetch comments and the diff
-are allowed; commands that comment, review, label, merge, or push are not.
+running any command. You have no shell access: the coordinator fetches the pull request diff and
+every existing comment during intake and persists them as plain files, and you only read those
+files.
 
-Fetch every existing comment on the pull request, including review-thread comments (resolved or
+Read every existing comment on the pull request, including review-thread comments (resolved or
 not) and plain conversation comments. Assign a stable number to each comment or thread in the
 order encountered, and record its kind (`review-thread` or `issue-comment`), root comment ID or
 URL, file and line when it applies, author, and quoted text.

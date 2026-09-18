@@ -27,15 +27,18 @@ Update `state.json` only after the corresponding artifact has been written succe
 ## Intake
 
 Record the pull request identity, URL, base and head branch names, and head SHA in `request.md`.
-Fetch every existing comment on the pull request, including review-thread comments (resolved or
-not) and plain conversation comments, and persist a concise snapshot. Set stage `reviewing`.
+Fetch the pull request diff (`gh pr diff` or `git diff <base>...<head>`) and every existing comment
+on the pull request, including review-thread comments (resolved or not) and plain conversation
+comments, and persist both as plain files (`diff.patch` and `existing-comments.md`) in the run
+directory. The Reviewer has no shell access and reads only what is persisted here. Set stage
+`reviewing`.
 
 ## Reviewing
 
-Invoke the native Reviewer with the pull request diff, description, repository instructions, and
-the existing-comment snapshot. The Reviewer must not edit or execute mutating commands. It must
-read every existing comment before drafting findings and drop any finding that substantively
-repeats one.
+Invoke the native Reviewer with the persisted diff, the pull request description, repository
+instructions, and the persisted existing-comment snapshot. The Reviewer has no tool access beyond
+reading files: it cannot edit, execute, or fetch anything itself. It must read every existing
+comment before drafting findings and drop any finding that substantively repeats one.
 
 Persist the exact result to the next findings artifact, set `currentFindings`, set stage
 `findings_review`, and stop. Tell the user the artifact path and ask which findings to post.
