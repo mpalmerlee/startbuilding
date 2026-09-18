@@ -210,6 +210,27 @@ Plugin components have the lowest precedence when a project or user defines the 
 ID. Testers must inspect component source paths so a stale customization cannot masquerade as the
 installed plugin.
 
+## Known limitations
+
+Staging by path (`git add -- <path>`, used by the `deliver` and `pr-resolve` Committers) stages
+that file's entire current diff, not only the hunks the approved plan or implementation produced.
+If a file already has an unrelated, unstaged edit sitting in the working tree when StartBuilding
+approves a change to that same file, `git add -- <path>` stages both together, and inspecting the
+resulting staged diff does not distinguish an approved hunk from an unrelated one once they share a
+file - both are just lines in the same staged diff.
+
+This is not new to `pr-resolve`; `deliver`'s Committer has had the identical pattern since its
+first release. It only became visible when `pr-resolve`'s multi-commit-group staging drew review
+attention to the same instruction.
+
+The documented mitigation today is procedural, not technical: avoid editing a file while a run is
+actively working on it. A fix under consideration is to record, before a run starts touching a
+path, whether that path already has uncommitted changes, and block staging and delivery for any
+path where that overlap exists, rather than attempting hunk-level patch surgery. Blocking matches
+the existing pattern used for protected paths, secrets, and unreviewed paths (see "Delivery
+scope" above) more closely than trying to separate hunks would, at the cost of being coarser:
+it would also block a same-file edit that does not actually overlap the approved hunks.
+
 ## Versioning
 
 Releases use semantic versioning. The version must match in all three plugin manifests and the

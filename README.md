@@ -319,6 +319,18 @@ catalog and plan ready for your review before implementing anything.
 - Both skills track which comments they have already posted or replied to, so a resumed run never
   double-posts.
 
+## Known limitations
+
+- **Editing a file StartBuilding is also changing, while a run is in progress.** The `deliver` and
+  `pr-resolve` Committers stage each approved path with `git add -- <path>`, which stages that
+  file's entire current diff, not only the hunks the approved plan produced. If you edit the same
+  file StartBuilding is changing before it delivers, your edit can be staged and committed
+  alongside the approved change instead of staying out of it; inspecting the staged diff does not
+  catch this, since an approved hunk and an unrelated hunk in the same file look identical once
+  staged. The practical mitigation today is procedural: avoid editing a file a run is actively
+  working on until it delivers. See [Known limitations](docs/architecture.md#known-limitations) in
+  the architecture doc for the design tradeoff and the fix under consideration.
+
 StartBuilding deliberately keeps orchestration local and visible. The repository remains the source
 of truth for architecture and validation, Git remains the source of truth for changes, and the
 developer remains the authority over plan approval and delivery.
