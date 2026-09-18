@@ -2,6 +2,30 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.4.0 - 2026-09-17
+
+### Added
+
+- Added the `/startbuilding:pr-review` skill graph: reviews the diff of the pull request matching
+  the current branch like a principal engineer, skips findings that substantively repeat an
+  existing PR comment, and posts only human-approved findings as a single `COMMENT`-event pull
+  request review with `gh`
+  (`intake -> reviewing -> findings_review -> posting -> posted | posting_blocked`).
+- Added the `/startbuilding:pr-resolve` skill graph: catalogs and numbers every comment on the
+  pull request matching the current branch, assigns each a category and recommendation, plans the
+  needed fixes, implements them once approved, commits each planned group separately, pushes, and
+  replies to every catalogued comment as appropriate
+  (`intake -> cataloging -> plan_review -> implementation -> implementation_blocked | delivery -> delivered | delivery_blocked`).
+- Added new shared agents: `startbuilding-pr-review-coordinator`, `startbuilding-pr-reviewer`,
+  `startbuilding-pr-commenter`, `startbuilding-pr-resolve-coordinator`,
+  `startbuilding-pr-resolve-planner`, `startbuilding-pr-resolve-implementer`, and
+  `startbuilding-pr-resolve-committer` (seven agents total across the two new graphs). Every
+  mutating agent in both graphs is restricted to plain comments and replies: neither graph can
+  submit a review `APPROVE`/`REQUEST_CHANGES` event, merge a pull request, close it, or edit its
+  title, description, or labels.
+- Extended `scripts/validate.py` to validate the two new skill graphs and their full agent
+  inventory alongside `deliver` and `research`.
+
 ## 0.3.1 - 2026-09-02
 
 ### Changed

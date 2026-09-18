@@ -11,7 +11,9 @@ claude plugin validate . --strict
 
 The repository validator checks manifest identity and version parity, component paths, skill links,
 project policy, the shared agent inventory, dual-vocabulary tool restrictions, coordinator
-allowlists, stale identifiers, ASCII text, trailing whitespace, and executable permissions.
+allowlists, stale identifiers, ASCII text, trailing whitespace, and executable permissions. It
+excludes `.startbuilding/runs/`, since that tree holds transient, gitignored workflow evidence
+rather than shipped plugin content.
 
 ## Prevent customization collisions
 
@@ -31,9 +33,9 @@ project file.
    copilot plugin install /absolute/path/to/startbuilding
    ```
 
-3. Reload the VS Code window. Open **Chat: Open Customizations** and confirm the `deliver` and
-   `research` skills and exactly nine StartBuilding agents have no diagnostics or duplicate
-   variants.
+3. Reload the VS Code window. Open **Chat: Open Customizations** and confirm the `deliver`,
+   `research`, `pr-review`, and `pr-resolve` skills and exactly sixteen StartBuilding agents have
+   no diagnostics or duplicate variants.
 4. Confirm every agent source resolves through the shared `agents/` directory.
 5. Invoke the Planner as a subagent and confirm it receives workspace read and file-search tools.
 6. Invoke the Implementer as a subagent and confirm it receives filesystem, edit, and shell tools.
@@ -42,7 +44,14 @@ project file.
    Researcher, Skeptic, and Merger. Confirm the Merger receives only workspace read and
    file-search tools, and that the Researcher and Skeptic receive those plus web fetch, with no
    edit or shell tools for any of the three.
-9. Disable the plugin and confirm its components disappear; enable it and confirm they return.
+9. Confirm `/startbuilding:pr-review` appears and the PR Review Coordinator can invoke the
+   Reviewer and Commenter. Confirm the Reviewer receives only workspace read and file-search
+   tools, with no shell access at all, and that only the Commenter receives shell access (for
+   `gh`), restricted by its own instructions to a `COMMENT`-event review.
+10. Confirm `/startbuilding:pr-resolve` appears and the PR Resolve Coordinator can invoke the
+    Planner, Implementer, and Committer, mirroring the `deliver` tool boundaries with no
+    independent-review role.
+11. Disable the plugin and confirm its components disappear; enable it and confirm they return.
 
 ## Copilot CLI local test
 
@@ -75,12 +84,19 @@ claude plugin validate . --strict
 claude --plugin-dir /absolute/path/to/startbuilding
 ```
 
-Inside Claude Code, confirm `/startbuilding:deliver` and `/startbuilding:research` are available and
-plugin agents appear under their scoped names, such as `startbuilding:startbuilding-implementer`.
-Confirm Planner gets only `Read`, `Glob`, and `Grep`; Implementer gets `Read`, `Glob`, `Grep`,
-`Edit`, `Write`, and `Bash`; and Coordinator gets `Read`, `Write`, `Edit`, `Bash`, and the scoped
-`Agent` allowlist. Confirm the Researcher, Skeptic, and Merger each get only `Read`, `Glob`, and
-`Grep`, and that the Research Coordinator's `Agent` allowlist names only those three. Use
+Inside Claude Code, confirm `/startbuilding:deliver`, `/startbuilding:research`,
+`/startbuilding:pr-review`, and `/startbuilding:pr-resolve` are available and plugin agents appear
+under their scoped names, such as `startbuilding:startbuilding-implementer`. Confirm Planner gets
+only `Read`, `Glob`, and `Grep`; Implementer gets `Read`, `Glob`, `Grep`, `Edit`, `Write`, and
+`Bash`; and Coordinator gets `Read`, `Write`, `Edit`, `Bash`, and the scoped `Agent` allowlist.
+Confirm the Researcher, Skeptic, and Merger each get only `Read`, `Glob`, and `Grep`, and that the
+Research Coordinator's `Agent` allowlist names only those three.
+
+Confirm the PR Reviewer gets only `Read`, `Glob`, and `Grep` (no `Bash`), the PR Commenter gets
+those plus `Bash`, and the PR Review Coordinator's `Agent` allowlist names only those two. Confirm
+the PR Resolve Planner gets only `Read`, `Glob`, and `Grep` (no `Bash`); the PR Resolve Implementer
+gets those plus `Edit`, `Write`, and `Bash`; the PR Resolve Committer gets `Read`, `Glob`, `Grep`,
+and `Bash`; and the PR Resolve Coordinator's `Agent` allowlist names only those three. Use
 `/reload-plugins` after changing components.
 
 Test persistent installation through the self-hosted catalog:
@@ -109,6 +125,10 @@ Configure `gh` against a disposable remote when testing delivery. Never use a pr
 for the first end-to-end run.
 
 Run the same work request independently in VS Code, Copilot CLI, and Claude Code.
+
+For `pr-review` and `pr-resolve`, open a disposable pull request against that remote, add a couple
+of review comments and a plain conversation comment to it, and check out its head branch before
+invoking either skill.
 
 ## Acceptance matrix
 
@@ -139,6 +159,21 @@ Run the same work request independently in VS Code, Copilot CLI, and Claude Code
 | No human response at recommendation review | Makes no further stage transition |
 | Requested revision | Repeats the needed stage, writes a suffixed artifact, and stops again at `recommendation_review` |
 | Accepted recommendation | Sets stage `completed` and stops |
+| No open PR for current branch | `pr-review`/`pr-resolve` stop with a blocker instead of guessing a PR |
+| New `pr-review` request | Derives the work ID from the PR number and fetches existing comments |
+| PR review findings | Excludes findings that substantively repeat an existing comment |
+| No findings approval | Makes no `gh` posting call |
+| PR head moved before posting | Posting blocks instead of anchoring to a stale diff position |
+| Explicit findings approval | Posts one `COMMENT`-event review with correctly anchored inline comments |
+| New `pr-resolve` request | Derives the work ID from the PR number and catalogs every comment |
+| Comment catalog | Numbers every review-thread and issue comment and assigns each a recommendation |
+| No plan approval | `pr-resolve` Implementer refuses without edits |
+| Explicit plan approval | Implements only the "fix now" items from the approved plan |
+| `pr-resolve` delivery | Commits each planned group separately, pushes once, and replies per comment |
+| Comment needing no reply | Gets no reply (pure observation or compliment) |
+| Comment resolved by a change | Gets a reply naming the commit that addressed it |
+| Comment with no change made | Gets a reply with the plan's recorded reasoning |
+| Re-run against the same PR | Never double-posts or double-replies |
 
 Inspect Git status, the staged diff, commit contents, remote branch, pull-request body, and run state
 after each applicable scenario.
