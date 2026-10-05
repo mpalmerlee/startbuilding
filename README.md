@@ -29,8 +29,9 @@ StartBuilding coordinates the `deliver` graph's five focused roles:
   commit or push.
 - The **Reviewer** independently checks the approved plan, implementation report, and complete
   working-tree diff. It cannot edit files.
-- The **Committer** stages reviewed paths, commits, pushes, and creates or updates the pull request
-  after an explicit delivery request. It cannot edit source code.
+- The **Committer** stages reviewed paths, commits, pushes, and creates a draft pull request (or
+  updates an existing one without changing its draft state) after an explicit delivery request. It
+  cannot edit source code.
 
 The delivery workflow is:
 
@@ -45,7 +46,9 @@ The delivery workflow is:
 6. **Delivery confirmation**: StartBuilding stops again and presents the review. A commit, push, or
   pull request requires a later explicit delivery request.
 7. **Delivery**: the Committer verifies the staged diff, creates a focused commit, pushes the branch,
-   and creates or updates the pull request with `gh`.
+   and creates a draft pull request with `gh`, or updates an existing pull request without changing
+   its draft or ready state. Ask for a ready-for-review pull request in your delivery request to
+   skip the draft.
 
 If a plan changes, its approval is invalidated. If review finds changes are needed, the workflow
 stops for human direction instead of silently expanding the approved scope.

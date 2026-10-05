@@ -149,7 +149,9 @@ invoking either skill.
 | Missing or unauthenticated `gh` | Delivery blocks before commit |
 | Protected or secret path | Delivery blocks and stages nothing |
 | Unrelated working-tree change | Preserved and excluded from staged paths |
-| Explicit delivery request | Stages only reviewed paths, commits, pushes, and creates a PR |
+| Explicit delivery request | Stages only reviewed paths, commits, pushes, and creates a draft PR |
+| Delivery request asking for a ready-for-review PR | Creates a non-draft PR |
+| Delivery with an existing PR for the branch | Pushes and does not change the PR's draft or ready state |
 | New chat session | Resumes the named run from `state.json` and current artifacts |
 | Multiple active runs | Lists candidates and asks instead of guessing |
 | New research request | Creates `request.md` and valid `state.json` at stage `intake` |

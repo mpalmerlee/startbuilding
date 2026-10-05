@@ -81,7 +81,8 @@ again.
 ## Delivery confirmation
 
 Continue only when the user explicitly requests delivery after the current review. Treat that
-request as an action, not a stored approval record, and invoke the Committer.
+request as an action, not a stored approval record, and invoke the Committer. Pass any explicit
+ready-for-review pull-request request from the user to the Committer.
 
 The Committer must block unless all of these are true:
 
@@ -97,7 +98,11 @@ Stage each reviewed implementation path explicitly. Never use `git add .`, `git 
 all current changes. Inspect the staged diff and require it to contain only reviewed paths. Do not
 bypass Git hooks.
 
-Create a focused commit, push the current branch, and create or update a pull request with `gh`.
+Create a focused commit and push the current branch. When no pull request exists for the branch,
+create it as a draft with `gh pr create --draft`. Leave out `--draft` only when the user's delivery
+request explicitly asks for a ready-for-review pull request. When a pull request already exists,
+push and update it as before, and never change its draft or ready state. If draft creation fails,
+do not retry without `--draft`; persist the report and set stage `delivery_blocked`.
 Build the pull-request body from the current plan, implementation, review, and validation results.
 Persist the exact Committer report as `delivery.md` and set stage `delivered`. On any failure, avoid
 further side effects, persist the report, set stage `delivery_blocked`, and explain what remains.
