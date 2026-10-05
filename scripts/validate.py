@@ -58,7 +58,13 @@ GRAPHS = {
             "planner": ("Status: awaiting approval",),
             "implementer": ("planApproval.artifact", "Status: ready for review"),
             "reviewer": ("Verdict: changes requested", "Verdict: ready for delivery"),
-            "committer": ("gh auth status", "git add -A", "Status: delivered", "gh pr create --draft"),
+            "committer": (
+                "gh auth status",
+                "git add -A",
+                "Status: delivered",
+                "create it as a draft with `gh pr create --draft`",
+                "Never run `gh pr ready`",
+            ),
         },
     },
     "research": {
