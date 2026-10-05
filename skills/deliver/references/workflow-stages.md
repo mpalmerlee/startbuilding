@@ -81,7 +81,8 @@ again.
 ## Delivery confirmation
 
 Continue only when the user explicitly requests delivery after the current review. Treat that
-request as an action, not a stored approval record, and invoke the Committer.
+request as an action, not a stored approval record, and invoke the Committer. Pass any explicit
+ready-for-review pull-request request from the user to the Committer.
 
 The Committer must block unless all of these are true:
 
@@ -91,13 +92,26 @@ The Committer must block unless all of these are true:
 - the current branch is not the default branch;
 - no reviewed path matches protected paths or likely secret files;
 - `git status` and the complete diff have been inspected;
-- `gh` is installed and authenticated before any commit is created.
+- `gh` is installed and authenticated, and the branch's existing pull request, if any, has been
+  checked with `gh pr view` before any commit is created.
 
 Stage each reviewed implementation path explicitly. Never use `git add .`, `git add -A`, or commit
 all current changes. Inspect the staged diff and require it to contain only reviewed paths. Do not
 bypass Git hooks.
 
-Create a focused commit, push the current branch, and create or update a pull request with `gh`.
-Build the pull-request body from the current plan, implementation, review, and validation results.
+Create a focused commit and push the current branch. When no open pull request exists for the
+branch, create it as a draft with `gh pr create --draft`. Leave out `--draft` only when the user's
+delivery request explicitly asks for a ready-for-review pull request. Build the pull-request title
+and body from the current plan, implementation, review, and validation results; use them only for
+`gh pr create`. When an open pull request already exists, only push; never run `gh pr edit` or
+`gh pr ready`, and never change its title, body, labels, or draft or ready state.
+
+If the user asked for a ready pull request but the existing one is a draft, the Committer reports
+`Status: delivered` with the `gh pr ready` command as a skipped action; set stage `delivered`.
+
+If draft creation fails, do not retry; persist the report and set stage `delivery_blocked`. That
+stage remains terminal. Recovery is the user running the reported `gh pr create` command, not a
+Committer retry.
+
 Persist the exact Committer report as `delivery.md` and set stage `delivered`. On any failure, avoid
 further side effects, persist the report, set stage `delivery_blocked`, and explain what remains.

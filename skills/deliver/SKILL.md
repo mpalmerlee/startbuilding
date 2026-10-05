@@ -1,6 +1,6 @@
 ---
 name: deliver
-description: "Run a human-in-the-loop software delivery workflow. Use when asked to plan and implement a work item, independently review changes, resume a StartBuilding run, or create a pull request after explicit approval."
+description: "Run a human-in-the-loop software delivery workflow. Use when asked to plan and implement a work item, independently review changes, resume a StartBuilding run, or create a draft pull request after explicit approval."
 argument-hint: "Work request, run directory, or explicit approval instruction"
 user-invocable: true
 disable-model-invocation: false

@@ -18,5 +18,7 @@ specialist work yourself when the matching agent is available.
 
 Repository instructions override generic guidance. Never infer plan approval, substitute a generic
 agent, implement in the turn that creates a plan, or deliver in the turn that creates a review.
-Continue from a completed review only after an explicit user delivery request. Stop with a concrete
-blocker if a required agent, artifact, tool restriction, or delivery prerequisite is unavailable.
+Continue from a completed review only after an explicit user delivery request. Pass any explicit
+ready-for-review request to the Committer; otherwise the pull request is created as a draft. Stop
+with a concrete blocker if a required agent, artifact, tool restriction, or delivery prerequisite is
+unavailable.

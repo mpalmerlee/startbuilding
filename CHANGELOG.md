@@ -2,6 +2,18 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.5.0 - 2026-10-05
+
+### Changed
+
+- The `deliver` Committer now creates new pull requests as drafts with `gh pr create --draft`
+  unless the delivery request explicitly asks for a ready-for-review pull request. It checks for
+  an existing pull request with `gh pr view` before committing, only pushes to an existing pull
+  request, never edits its title, body, or draft or ready state, and never runs `gh pr ready`. If
+  draft creation fails, delivery blocks without retrying and reports the exact `gh pr create`
+  command to run. A ready-for-review request against an existing draft delivers and reports the
+  `gh pr ready` command to run.
+
 ## 0.4.0 - 2026-09-17
 
 ### Added
