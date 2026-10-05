@@ -188,7 +188,8 @@ The Implementer reports repository-relative `implementationPaths`. The Reviewer 
 working-tree diff and reports the subset of those paths it actually reviewed. The Committer stages
 each reviewed implementation path explicitly and compares the staged diff with that scope. It
 creates new pull requests as drafts unless the delivery request explicitly asks for a
-ready-for-review pull request, and never changes an existing pull request's draft or ready state.
+ready-for-review pull request, and only pushes to an existing pull request, never editing its
+title, body, or draft or ready state.
 
 This design allows unrelated pre-existing changes to remain in the working tree without silently
 including them in the pull request. Ambiguous, protected, secret-bearing, or unreviewed paths block
