@@ -151,7 +151,10 @@ invoking either skill.
 | Unrelated working-tree change | Preserved and excluded from staged paths |
 | Explicit delivery request | Stages only reviewed paths, commits, pushes, and creates a draft PR |
 | Delivery request asking for a ready-for-review PR | Creates a non-draft PR |
-| Delivery with an existing PR for the branch | Pushes and does not change the PR's draft or ready state |
+| Delivery with an existing PR for the branch | Pushes and does not edit the PR's title, body, or draft or ready state |
+| Draft PR creation fails | Delivery blocks without retrying with or without `--draft`; the report says the commit and push already happened and gives the exact `gh pr create` command |
+| Ready-for-review request with an existing draft PR | Pushes, does not run `gh pr ready`, reports the command as a skipped action, and ends `delivered` |
+| Existing-PR check fails with a `gh` error | Delivery blocks before commit |
 | New chat session | Resumes the named run from `state.json` and current artifacts |
 | Multiple active runs | Lists candidates and asks instead of guessing |
 | New research request | Creates `request.md` and valid `state.json` at stage `intake` |
