@@ -23,15 +23,19 @@ no human approval gate: nothing in this workflow changes anything on GitHub.
    - If either command fails because the context is not a single Git repository with a GitHub
      remote (no repository, a multi-root workspace, or no GitHub remote), ask the user for the
      target `owner/name` and stop until they answer. Never guess. This is not
-     `collection_blocked`, and no run directory is created yet.
+     `collection_blocked`, and no run directory is created before the user answers. Once the user
+     supplies `owner/name` from such a non-repository context, the artifact root is the current
+     working directory and the run directory is created under it.
    - Only a failed lookup of an explicitly named repository (not found or no access) stops at
      `collection_blocked`.
 
    After resolution, every `gh pr` call passes `--repo <nameWithOwner>`, and every `gh api graphql`
    call passes `-f owner=<owner> -f name=<name>`. `gh auth status` takes no repository argument.
-4. For a new request, derive the work ID `repo-pr-status-<YYYYMMDD>-<HHMM>` from the current UTC
-   time, create the run directory, `request.md`, and initial `state.json` with stage `intake`.
-   Record the resolved `nameWithOwner` and default branch in `request.md`.
+4. For a new request, derive the work ID `repo-pr-status-<YYYYMMDD>-<HHMMSS>` from the current UTC
+   time. If that run directory already exists under the artifact root, append the next free
+   numeric suffix (`-2`, `-3`, and so on). Create the run directory, `request.md`, and initial
+   `state.json` with stage `intake`. Record the resolved `nameWithOwner` and default branch in
+   `request.md`.
 5. For a resumed request, validate the state shape and current artifact pointers before choosing a
    transition.
 

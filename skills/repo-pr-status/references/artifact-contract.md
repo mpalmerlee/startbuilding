@@ -1,9 +1,13 @@
 # Run artifact contract
 
-Store transient workflow state under `.startbuilding/runs/<work-id>/`. The work ID is
-`repo-pr-status-<YYYYMMDD>-<HHMM>` in UTC, such as `repo-pr-status-20261012-1530`. Add
-`.startbuilding/runs/` to the target repository's `.gitignore` unless the team deliberately
-versions workflow evidence.
+Store transient workflow state under `.startbuilding/runs/<work-id>/` inside the artifact root.
+The artifact root is the `git rev-parse --show-toplevel` directory when the current directory is
+inside a Git checkout, and otherwise the current working directory. The work ID is
+`repo-pr-status-<YYYYMMDD>-<HHMMSS>` in UTC, such as `repo-pr-status-20261012-153000`. If that run
+directory already exists, append the next free numeric suffix, such as
+`repo-pr-status-20261012-153000-2`, then `-3`, and so on. Whether to ignore or version
+`.startbuilding/runs/` is the repository owner's choice; do not add it to `.gitignore` or suggest
+adding it.
 
 ## Files
 
@@ -50,7 +54,7 @@ Create state with this minimum shape and preserve unknown fields whenever it is 
 ```json
 {
   "version": 1,
-  "workId": "repo-pr-status-20260101-0000",
+  "workId": "repo-pr-status-20260101-000000",
   "repo": "example/example",
   "stage": "intake",
   "snapshotAt": null,
@@ -62,8 +66,8 @@ Create state with this minimum shape and preserve unknown fields whenever it is 
 }
 ```
 
-Timestamps use UTC RFC 3339 format. Paths are repository-relative, use forward slashes, and must
-not traverse outside the repository.
+Timestamps use UTC RFC 3339 format. Paths are relative to the artifact root, use forward slashes,
+and must not traverse outside it.
 
 ## Resume selection
 

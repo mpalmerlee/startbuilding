@@ -196,10 +196,11 @@ or it has been inactive for 90 days. Thresholds and label lists can be overridde
 
 There is no approval gate, because nothing is posted, labeled, or closed. You can ask to reclassify
 an existing run with different thresholds; that reuses the same snapshot and writes a suffixed
-report. Each run is stored locally under a timestamped work ID:
+report. Each run is stored locally under a timestamped work ID; outside a Git checkout, runs are
+stored under the current directory:
 
 ```text
-.startbuilding/runs/repo-pr-status-<YYYYMMDD>-<HHMM>/
+.startbuilding/runs/repo-pr-status-<YYYYMMDD>-<HHMMSS>/
 |-- request.md
 |-- config.json
 |-- rules.md
