@@ -64,7 +64,7 @@ Apply these rules to every pull request in `snapshot.json` using the thresholds 
 | `wip-title` | The title matches `^\s*(\[?WIP\]?\|Draft:)`, case-insensitive | draft |
 | `wip-label` | A label in `wipLabels` | draft |
 | `blocked-label` | A label in `blockedLabels` | blocked |
-| `stacked-on-open-pr` | `baseRefName` equals the `headRefName` of another open pull request | blocked |
+| `stacked-on-open-pr` | `baseRefName` equals the `headRefName` of another open pull request whose `isCrossRepository` is false | blocked |
 | `awaiting-ci` | `approved` matches, CI state is `pending`, and no waiting-on-author driving tag matches | blocked |
 | `blocked-by-protection` | `approved` matches, `mergeStateStatus` is `BLOCKED`, CI is `passing` or `none`, and no waiting-on-author driving tag matches | blocked |
 | `changes-requested` | `openChangeRequests` is not empty | waiting-on-author |

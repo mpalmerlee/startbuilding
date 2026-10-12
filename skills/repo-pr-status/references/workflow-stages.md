@@ -44,7 +44,11 @@ no human approval gate: nothing in this workflow changes anything on GitHub.
 Record the target repository, any threshold overrides, and the request text in `request.md`.
 Resolve `config.json` from, lowest to highest precedence: the bundled
 `skills/repo-pr-status/assets/repo-pr-status-config.json`, the target repository's
-`.startbuilding/repo-pr-status.json` when present, and overrides stated in the request. Copy
+`.startbuilding/repo-pr-status.json` when present, and overrides stated in the request. Read the
+repository override file only when the artifact root is a Git checkout whose
+`gh repo view --json nameWithOwner` matches the target repository; otherwise record "repository
+override file not read: target is not the local checkout" in `request.md`. Overrides stated in the
+request always apply. No REST call is made to fetch the override file. Copy
 `skills/repo-pr-status/references/status-rules.md` exactly to `rules.md`. Set stage `collecting`.
 
 ## Collecting

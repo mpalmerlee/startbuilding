@@ -22,7 +22,8 @@ Read the references when their subject becomes relevant:
 - [Status rules](./references/status-rules.md) defines derived values, the tag vocabulary, the
   statuses, and their precedence.
 - [Default configuration](./assets/repo-pr-status-config.json) holds the default thresholds and
-  label lists. A target repository may override them in `.startbuilding/repo-pr-status.json`.
+  label lists. A target repository may override them in `.startbuilding/repo-pr-status.json`
+  when run from the target repository's checkout.
 
 ## Specialist agents
 

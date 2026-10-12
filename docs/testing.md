@@ -229,6 +229,8 @@ the output must be identical.
 | Run from a non-repository directory | Asks for `owner/name`, creates no run directory, and is not `collection_blocked` |
 | `owner/name` supplied from outside a repository | Collects with `gh repo view <owner/name>`, `--repo`, and GraphQL variables, creates the run directory under the current directory, and reaches `reported` |
 | Two fresh runs in the same second | Second run gets a `-2` suffixed work ID |
+| Fork PR head branch matches another PR's base | Not `stacked-on-open-pr` |
+| `owner/name` differs from local checkout | Override file not read; recorded in `request.md` |
 | Every report row | Has at least one bold tag |
 
 Inspect Git status, the staged diff, commit contents, remote branch, pull-request body, and run state

@@ -192,7 +192,8 @@ as `changes-requested`, `ci-failing`, `merge-conflict`, `awaiting-author-reply`,
 `inactive`, or `linked-issues-closed`. `stale` means nobody has acted for a while
 (30 days by default); `possibly-obsolete` means there is evidence the change is no longer needed,
 or it has been inactive for 90 days. Thresholds and label lists can be overridden in
-`.startbuilding/repo-pr-status.json` or in the request.
+`.startbuilding/repo-pr-status.json` when run from the target repository's checkout, or in the
+request.
 
 There is no approval gate, because nothing is posted, labeled, or closed. You can ask to reclassify
 an existing run with different thresholds; that reuses the same snapshot and writes a suffixed

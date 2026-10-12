@@ -17,7 +17,8 @@ All notable changes to StartBuilding are documented in this file.
   `draft`, `blocked`, `waiting-on-author`, `ready-to-merge`, `needs-review`, `unclassified`),
   driving and informational reason tags, and default thresholds of 14 days for `aging`, 30 days
   for `stale`, and 90 days for the time-only `abandoned` rule, overridable per repository in
-  `.startbuilding/repo-pr-status.json`. `blocked` includes approved pull requests waiting on CI
+  `.startbuilding/repo-pr-status.json` when run from the target repository's checkout.
+  `blocked` includes approved pull requests waiting on CI
   (`awaiting-ci`) or on branch protection (`blocked-by-protection`), and unanswered reviewer
   comments drive `waiting-on-author`. Base-branch state, linked-issue state, comments, reviews,
   and review threads come from one read-only GraphQL `query` per pull request, which identifies
