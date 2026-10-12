@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "agingDays": 14,
+  "staleDays": 30,
+  "obsoleteDays": 90,
+  "largeDiffLines": 1000,
+  "largeDiffFiles": 50,
+  "maxPullRequests": 100,
+  "ignoreBots": true,
+  "blockedLabels": ["blocked", "on hold", "do not merge", "needs decision"],
+  "wipLabels": ["wip", "work in progress"],
+  "staleLabels": ["stale"],
+  "obsoleteLabels": ["obsolete", "wontfix", "superseded", "duplicate"]
+}

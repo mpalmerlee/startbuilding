@@ -2,6 +2,31 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.6.0 - 2026-10-12
+
+### Added
+
+- Added the `/startbuilding:repo-pr-status` skill graph: takes a read-only snapshot of every open
+  pull request in the current repository or a user-named `owner/name` (asking for one when the
+  context is not a single GitHub repository), assigns each exactly one status with every matching
+  reason tag and a suggested next action, and writes a local Markdown report
+  (`intake -> collecting -> classifying -> reported | collection_blocked`, with an explicit
+  reclassify loop that reuses the snapshot). It never makes a mutating `gh` call and has no
+  approval gate.
+- Added the status and tag model: eight statuses in precedence order (`possibly-obsolete`, `stale`,
+  `draft`, `blocked`, `waiting-on-author`, `ready-to-merge`, `needs-review`, `unclassified`),
+  driving and informational reason tags, and default thresholds of 14 days for `aging`, 30 days
+  for `stale`, and 90 days for the time-only `abandoned` rule, overridable per repository in
+  `.startbuilding/repo-pr-status.json`. `blocked` includes approved pull requests waiting on CI
+  (`awaiting-ci`) or on branch protection (`blocked-by-protection`), and unanswered reviewer
+  comments drive `waiting-on-author`. Base-branch state, linked-issue state, comments, reviews,
+  and review threads come from one read-only GraphQL `query` per pull request, which identifies
+  bot authors by `__typename` so bot comments never count as reviewer feedback.
+- Added new shared agents: `startbuilding-repo-pr-status-coordinator` and
+  `startbuilding-repo-pr-status-analyst`. The Analyst has no shell, edit, or network access.
+- Extended `scripts/validate.py` to validate the new skill graph, its agents and configuration
+  asset, and the Coordinator's read-only `gh` markers, and to report missing agent files as errors.
+
 ## 0.5.0 - 2026-10-05
 
 ### Changed

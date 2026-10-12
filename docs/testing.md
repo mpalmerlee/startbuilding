@@ -34,8 +34,8 @@ project file.
    ```
 
 3. Reload the VS Code window. Open **Chat: Open Customizations** and confirm the `deliver`,
-   `research`, `pr-review`, and `pr-resolve` skills and exactly sixteen StartBuilding agents have
-   no diagnostics or duplicate variants.
+   `research`, `pr-review`, `pr-resolve`, and `repo-pr-status` skills and exactly eighteen
+   StartBuilding agents have no diagnostics or duplicate variants.
 4. Confirm every agent source resolves through the shared `agents/` directory.
 5. Invoke the Planner as a subagent and confirm it receives workspace read and file-search tools.
 6. Invoke the Implementer as a subagent and confirm it receives filesystem, edit, and shell tools.
@@ -51,7 +51,10 @@ project file.
 10. Confirm `/startbuilding:pr-resolve` appears and the PR Resolve Coordinator can invoke the
     Planner, Implementer, and Committer, mirroring the `deliver` tool boundaries with no
     independent-review role.
-11. Disable the plugin and confirm its components disappear; enable it and confirm they return.
+11. Confirm `/startbuilding:repo-pr-status` appears and the Repo PR Status Coordinator can invoke
+    only the Analyst. Confirm the Analyst receives only workspace read and file-search tools, with
+    no shell, edit, or web access.
+12. Disable the plugin and confirm its components disappear; enable it and confirm they return.
 
 ## Copilot CLI local test
 
@@ -85,7 +88,8 @@ claude --plugin-dir /absolute/path/to/startbuilding
 ```
 
 Inside Claude Code, confirm `/startbuilding:deliver`, `/startbuilding:research`,
-`/startbuilding:pr-review`, and `/startbuilding:pr-resolve` are available and plugin agents appear
+`/startbuilding:pr-review`, `/startbuilding:pr-resolve`, and `/startbuilding:repo-pr-status` are
+available and plugin agents appear
 under their scoped names, such as `startbuilding:startbuilding-implementer`. Confirm Planner gets
 only `Read`, `Glob`, and `Grep`; Implementer gets `Read`, `Glob`, `Grep`, `Edit`, `Write`, and
 `Bash`; and Coordinator gets `Read`, `Write`, `Edit`, `Bash`, and the scoped `Agent` allowlist.
@@ -96,8 +100,10 @@ Confirm the PR Reviewer gets only `Read`, `Glob`, and `Grep` (no `Bash`), the PR
 those plus `Bash`, and the PR Review Coordinator's `Agent` allowlist names only those two. Confirm
 the PR Resolve Planner gets only `Read`, `Glob`, and `Grep` (no `Bash`); the PR Resolve Implementer
 gets those plus `Edit`, `Write`, and `Bash`; the PR Resolve Committer gets `Read`, `Glob`, `Grep`,
-and `Bash`; and the PR Resolve Coordinator's `Agent` allowlist names only those three. Use
-`/reload-plugins` after changing components.
+and `Bash`; and the PR Resolve Coordinator's `Agent` allowlist names only those three. Confirm the
+Repo PR Status Analyst gets only `Read`, `Glob`, and `Grep` (no `Bash`), and the Repo PR Status
+Coordinator's `Agent` allowlist names only the Analyst. Use `/reload-plugins` after changing
+components.
 
 Test persistent installation through the self-hosted catalog:
 
@@ -129,6 +135,17 @@ Run the same work request independently in VS Code, Copilot CLI, and Claude Code
 For `pr-review` and `pr-resolve`, open a disposable pull request against that remote, add a couple
 of review comments and a plain conversation comment to it, and check out its head branch before
 invoking either skill.
+
+For `repo-pr-status`, seed the disposable remote with open pull requests matching the acceptance
+matrix: a draft, one labeled `blocked`, one with a change request and no push since, one with a
+failing required check, one with a merge conflict, one approved with green CI, one with no reviews,
+one whose linked issue is closed, one with a "superseded by #N" comment, one approved with a
+long-running pending check, one approved but blocked by a required status check that never
+reports, one with an unanswered `COMMENTED` review, one with an unanswered conversation comment,
+one partially approved under a two-approval rule, and one whose base is a deleted `feature/x`
+branch. Also run once from a non-repository directory. Record
+`gh pr list --state open --json number,updatedAt,labels,reviewDecision` before and after the run;
+the output must be identical.
 
 ## Acceptance matrix
 
@@ -179,6 +196,37 @@ invoking either skill.
 | Comment resolved by a change | Gets a reply naming the commit that addressed it |
 | Comment with no change made | Gets a reply with the plan's recorded reasoning |
 | Re-run against the same PR | Never double-posts or double-replies |
+| Context is not a single GitHub repository | `repo-pr-status` asks for the target `owner/name` instead of guessing |
+| Unauthenticated `gh` for `repo-pr-status` | Stops at `collection_blocked` |
+| `repo-pr-status` run | Writes `snapshot.json`, `config.json`, `rules.md`, and `report.md`, stops at `reported`, and makes no mutating `gh` call |
+| Summary counts | Add up to the open pull request count |
+| Draft PR | `draft` with bold `draft` |
+| PR labeled `blocked` | `blocked` with bold `blocked-label` |
+| Change requested, no push since | `waiting-on-author` with bold `changes-requested` |
+| Same PR after a push | `needs-review` with bold `re-review`, plus `change-request-not-dismissed` |
+| Failing required check | `waiting-on-author` with bold `ci-failing` |
+| Merge conflict | `waiting-on-author` with bold `merge-conflict` |
+| Approved, green CI | `ready-to-merge` with bold `approved` |
+| No reviews | `needs-review` with bold `first-review`, plus `no-reviewers` |
+| Linked issue closed | `possibly-obsolete` with bold `linked-issues-closed` |
+| "superseded by #N" comment | `possibly-obsolete` with bold `superseded-mention` |
+| Reclassify with `staleDays: 0` and `obsoleteDays: null` | Every PR without evidence tags is `stale` with bold `inactive`, written to `report-2.md` without fetching again |
+| Reclassify with `obsoleteDays: 0` | `possibly-obsolete` with bold `abandoned` |
+| PR both failing CI and stale | `stale` with bold `inactive` and plain `ci-failing` |
+| Reclassify with the same config | Same statuses and tags as the previous report |
+| Simulated per-PR fetch failure | That PR is `unclassified` with `data-gap` and listed under Data gaps |
+| Approved, CI pending | `blocked` with bold `awaiting-ci`, plain `ci-pending` |
+| Approved, CI passing, required check never reports | `blocked` with bold `blocked-by-protection` |
+| Unanswered `COMMENTED` review | `waiting-on-author` with bold `awaiting-author-reply` |
+| Unanswered conversation comment | `waiting-on-author` with bold `awaiting-author-reply` |
+| Bot comment newer than the last push | Not `awaiting-author-reply`; the bot is not `lastActor` |
+| Author replies after that comment | `needs-review` with bold `re-review` |
+| Partial approval under `REVIEW_REQUIRED`, no requests | `needs-review` with bold `review-pending` |
+| Deleted base `feature/x` | `possibly-obsolete` with bold `base-branch-missing` |
+| Fetch failure on a PR labeled `stale` | `unclassified` with bold `data-gap`, plain `stale-label` |
+| Run from a non-repository directory | Asks for `owner/name`, creates no run directory, and is not `collection_blocked` |
+| `owner/name` supplied from outside a repository | Collects with `gh repo view <owner/name>`, `--repo`, and GraphQL variables, and reaches `reported` |
+| Every report row | Has at least one bold tag |
 
 Inspect Git status, the staged diff, commit contents, remote branch, pull-request body, and run state
 after each applicable scenario.

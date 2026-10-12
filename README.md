@@ -2,7 +2,7 @@
 
 StartBuilding is a plugin framework for human-in-the-loop agentic graphs of specialist agents in
 VS Code, GitHub Copilot CLI, and Claude Code. Each graph is a resumable, file-backed workflow with
-named roles, least-privilege tools, and explicit human gates. StartBuilding currently ships four
+named roles, least-privilege tools, and explicit human gates. StartBuilding currently ships five
 skill graphs:
 
 - `deliver`: plans a change, implements it, reviews it, and prepares a pull request without
@@ -14,6 +14,10 @@ skill graphs:
 - `pr-resolve`: catalogs and numbers every comment on the pull request for your current branch,
   plans the fixes, implements them once you approve the plan, and replies to each comment once
   it's addressed.
+- `repo-pr-status`: reports on every open pull request in a repository, showing which are waiting
+  on the author, need review, are ready to merge, are blocked, are drafts, are stale, or are
+  possibly obsolete, with the reasons and a suggested next action for each. It never changes
+  anything on GitHub.
 
 StartBuilding uses the coding-agent host, Git, and local Markdown and JSON artifacts. It does not
 run a background service, database, scheduler, or separate orchestration UI.
@@ -160,6 +164,50 @@ Each run is stored locally under a work ID derived from the pull request number:
 `-- state.json
 ```
 
+## How repo PR status works
+
+StartBuilding also coordinates a read-only `repo-pr-status` graph with two roles, scoped to the
+GitHub repository of your current working directory or a user-named `owner/name`. If the agent is
+not inside a single Git repository with a GitHub remote, such as in a multi-root workspace,
+StartBuilding asks you for the target `owner/name` instead of guessing.
+
+- The **Repo PR Status Coordinator** owns workflow state, collects open pull request data with
+  read-only `gh` calls, and delegates classification.
+- The **Analyst** applies the status rules to the collected snapshot and writes the report. It
+  cannot edit files, run commands, or reach the network.
+
+The repo PR status workflow is:
+
+```text
+intake -> collecting -> classifying -> reported | collection_blocked
+reported -> classifying (explicit reclassify request)
+```
+
+Each pull request gets exactly one status, checked in this order: `possibly-obsolete`, `stale`,
+`draft`, `blocked`, `waiting-on-author`, `ready-to-merge`, `needs-review`, and `unclassified`.
+`blocked` covers pull requests whose next step belongs to neither the author nor reviewers: an
+external dependency, CI still running on an approved pull request, or an unmet branch protection
+requirement that `gh` cannot identify. Each pull request also gets every matching reason tag, such
+as `changes-requested`, `ci-failing`, `merge-conflict`, `awaiting-author-reply`, `first-review`,
+`inactive`, or `linked-issues-closed`. `stale` means nobody has acted for a while
+(30 days by default); `possibly-obsolete` means there is evidence the change is no longer needed,
+or it has been inactive for 90 days. Thresholds and label lists can be overridden in
+`.startbuilding/repo-pr-status.json` or in the request.
+
+There is no approval gate, because nothing is posted, labeled, or closed. You can ask to reclassify
+an existing run with different thresholds; that reuses the same snapshot and writes a suffixed
+report. Each run is stored locally under a timestamped work ID:
+
+```text
+.startbuilding/runs/repo-pr-status-<YYYYMMDD>-<HHMM>/
+|-- request.md
+|-- config.json
+|-- rules.md
+|-- snapshot.json
+|-- report.md
+`-- state.json
+```
+
 ## Durable workflow state
 
 Each run is stored locally under:
@@ -196,6 +244,8 @@ prefix, but no initialization step is required.
 - For `pr-review` and `pr-resolve`, `gh` authenticated with permission to read and comment on pull
   requests is required from the start, since both skills begin by resolving the pull request for
   your current branch.
+- For `repo-pr-status`, `gh` authenticated with read access to the target repository's pull
+  requests.
 
 ## Install
 
@@ -300,6 +350,15 @@ its feedback:
 StartBuilding catalogs every comment on the pull request, delegates planning, and stops with the
 catalog and plan ready for your review before implementing anything.
 
+Invoke the repo PR status skill from the repository you want a report on:
+
+```text
+/startbuilding:repo-pr-status
+```
+
+StartBuilding collects every open pull request with read-only `gh` calls, delegates classification,
+and stops with the report ready.
+
 ## Safety boundaries
 
 - Plan approval is never inferred from silence, an agent message, or approval from another run.
@@ -322,6 +381,8 @@ catalog and plan ready for your review before implementing anything.
   instead of posting against a diff that has since moved.
 - Both skills track which comments they have already posted or replied to, so a resumed run never
   double-posts.
+- `repo-pr-status` never makes a mutating `gh` call: no comments, reviews, labels, edits, closes,
+  or merges.
 
 ## Known limitations
 
@@ -335,13 +396,14 @@ catalog and plan ready for your review before implementing anything.
   working on until it delivers. See [Known limitations](docs/architecture.md#known-limitations) in
   the architecture doc for the design tradeoff and the fix under consideration.
 - **The Coordinator's tool access is broader than its role.** Every Coordinator (`deliver`,
-  `research`, `pr-review`, `pr-resolve`) carries `Write`, `Edit`, and `Bash` alongside its `Agent`
-  allowlist, because orchestration legitimately needs to write run artifacts and run precondition
-  checks like `git status` or `gh auth status`. Nothing at the tool-restriction layer stops the
-  Coordinator from also using those same tools to edit source, commit, push, or post PR comments
-  itself instead of delegating to the specialist whose role that is - only its instructions say not
-  to. See [Known limitations](docs/architecture.md#known-limitations) in the architecture doc for
-  more detail.
+  `research`, `pr-review`, `pr-resolve`, `repo-pr-status`) carries `Write`, `Edit`, and `Bash`
+  alongside its `Agent` allowlist, because orchestration legitimately needs to write run artifacts
+  and run precondition checks like `git status` or `gh auth status`. Nothing at the
+  tool-restriction layer stops the Coordinator from also using those same tools to edit source,
+  commit, push, or post PR comments itself instead of delegating to the specialist whose role that
+  is - only its instructions say not to. See
+  [Known limitations](docs/architecture.md#known-limitations) in the architecture doc for more
+  detail.
 
 StartBuilding deliberately keeps orchestration local and visible. The repository remains the source
 of truth for architecture and validation, Git remains the source of truth for changes, and the

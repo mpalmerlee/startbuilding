@@ -42,6 +42,16 @@ SKILLS = {
             "startbuilding:startbuilding-pr-resolve-planner",
         ),
     },
+    "repo-pr-status": {
+        "markers": (
+            "./references/workflow-stages.md",
+            "./references/artifact-contract.md",
+            "./references/status-rules.md",
+            "./assets/repo-pr-status-config.json",
+            "startbuilding-repo-pr-status-analyst",
+            "startbuilding:startbuilding-repo-pr-status-analyst",
+        ),
+    },
 }
 
 GRAPHS = {
@@ -110,6 +120,17 @@ GRAPHS = {
             "pr-resolve-planner": ("Status: awaiting approval",),
             "pr-resolve-implementer": ("planApproval.artifact", "Status: ready for delivery"),
             "pr-resolve-committer": ("gh auth status", "git add -A", "Status: delivered"),
+        },
+    },
+    "repo-pr-status": {
+        "roles": ("repo-pr-status-coordinator", "repo-pr-status-analyst"),
+        "tools": {
+            "repo-pr-status-coordinator": '[read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-repo-pr-status-analyst)"]',
+            "repo-pr-status-analyst": "[read, search, Read, ToolSearch, Glob, Grep]",
+        },
+        "contract_markers": {
+            "repo-pr-status-analyst": ("Status: report ready",),
+            "repo-pr-status-coordinator": ("gh auth status", "-X GET", "mutation", "untrusted data"),
         },
     },
 }
@@ -237,6 +258,10 @@ class Validation:
         if research_config.get("version") != 1:
             self.fail("Research project configuration version must be 1")
 
+        status_config = self.read_json("skills/repo-pr-status/assets/repo-pr-status-config.json")
+        if status_config.get("version") != 1:
+            self.fail("Repo PR status configuration version must be 1")
+
     def validate_agents(self) -> None:
         agent_dir = self.root / "agents"
         agent_files = sorted(agent_dir.glob("*.agent.md")) if agent_dir.is_dir() else []
@@ -264,17 +289,19 @@ class Validation:
                     if agent_fields.get("user-invocable") != "false":
                         self.fail(f"Shared {role} must be hidden from the normal picker")
 
-            coordinator_text = self.require_file(
+            coordinator_path = self.require_file(
                 f"agents/startbuilding-{coordinator_role}.agent.md"
-            ).read_text(encoding="utf-8")
+            )
+            coordinator_text = (
+                coordinator_path.read_text(encoding="utf-8") if coordinator_path.is_file() else ""
+            )
             for role in roles[1:]:
                 if agent_names[role] not in coordinator_text:
                     self.fail(f"Shared {coordinator_role} is missing {agent_names[role]}")
 
             for role, markers in graph["contract_markers"].items():
-                text = self.require_file(
-                    f"agents/startbuilding-{role}.agent.md"
-                ).read_text(encoding="utf-8")
+                role_path = self.require_file(f"agents/startbuilding-{role}.agent.md")
+                text = role_path.read_text(encoding="utf-8") if role_path.is_file() else ""
                 for marker in markers:
                     if marker not in text:
                         self.fail(f"{role} is missing contract marker: {marker}")
@@ -311,6 +338,7 @@ class Validation:
             for marker in (
                 "/startbuilding:deliver",
                 "/startbuilding:research",
+                "/startbuilding:repo-pr-status",
                 "copilot plugin install mpalmerlee/startbuilding",
                 "claude plugin marketplace add mpalmerlee/startbuilding",
                 "VS Code also discovers plugins installed by Copilot CLI",
