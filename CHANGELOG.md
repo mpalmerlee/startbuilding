@@ -31,6 +31,12 @@ All notable changes to StartBuilding are documented in this file.
 - Extended `scripts/validate.py` to validate the new skill graph, its agents and configuration
   asset, and the Coordinator's read-only `gh` markers, and to report missing agent files as errors.
 
+### Changed
+
+- Skills no longer tell agents to add `.startbuilding/runs/` to `.gitignore` or suggest it;
+  ignoring or committing run artifacts is the user's choice. Delivery still never stages run
+  artifacts, and their presence in the working tree no longer blocks delivery.
+
 ## 0.5.0 - 2026-10-05
 
 ### Changed

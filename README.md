@@ -226,12 +226,9 @@ Each run is stored locally under:
 
 These artifacts make the workflow reviewable and resumable across chat sessions. Plan approval
 records the current plan artifact. A revision creates a new artifact and requires fresh approval;
-delivery confirmation is not stored as a formal approval. Run artifacts are transient by default
-and should be excluded from source control:
-
-```gitignore
-.startbuilding/runs/
-```
+delivery confirmation is not stored as a formal approval. Run artifacts are transient by default.
+Whether to ignore `.startbuilding/runs/` or commit it as workflow evidence is your choice;
+StartBuilding never stages run artifacts during delivery.
 
 StartBuilding follows the target repository's instructions. An optional
 `.startbuilding/project.json` can define validation commands, protected paths, and the branch

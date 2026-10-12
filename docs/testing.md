@@ -166,6 +166,7 @@ the output must be identical.
 | Missing or unauthenticated `gh` | Delivery blocks before commit |
 | Protected or secret path | Delivery blocks and stages nothing |
 | Unrelated working-tree change | Preserved and excluded from staged paths |
+| Target repository does not ignore `.startbuilding/runs/` | No skill edits `.gitignore` or suggests ignoring runs; untracked or modified run artifacts do not block delivery, and only reviewed paths are staged |
 | Explicit delivery request | Stages only reviewed paths, commits, pushes, and creates a draft PR |
 | Delivery request asking for a ready-for-review PR | Creates a non-draft PR |
 | Delivery with an existing PR for the branch | Pushes and does not edit the PR's title, body, or draft or ready state |

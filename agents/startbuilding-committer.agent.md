@@ -15,7 +15,9 @@ Before any side effect:
 2. Require the current review to end `Verdict: ready for delivery` and require
    `reviewedPaths` to cover every intended `implementationPaths` entry.
 3. Inspect the complete status and diff. Require a non-default branch and reject protected paths,
-   likely secrets, `.startbuilding/runs/`, and unreviewed delivery paths.
+   likely secrets, `.startbuilding/runs/`, and unreviewed delivery paths. Never stage run artifacts
+   under `.startbuilding/runs/`; their presence in the working tree, whether untracked or modified,
+   does not block delivery.
 4. Run `gh auth status`, then `gh pr view` for the current branch, and record whether an open
    pull request exists and whether it is a draft. Treat only a "no pull requests found" result as
    no pull request; any other `gh` error is a blocker. Verify push/PR prerequisites before creating
