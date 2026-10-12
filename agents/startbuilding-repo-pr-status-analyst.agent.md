@@ -25,10 +25,11 @@ short evidence such as `changes requested by @x 2026-10-01`.
 Return Markdown in this order:
 
 1. `# Repository PR Status Report` with the repository, `snapshotAt`, the thresholds used, the
-   total number of open pull requests, and a truncation notice when the snapshot is truncated.
+   total number of open pull requests (`openPrTotal`), the number of classified pull requests in
+   the snapshot, and a truncation notice when the snapshot is truncated.
 2. `## Summary` with a Status | Count | Oldest last activity table in the order ready-to-merge,
    needs-review, waiting-on-author, blocked, draft, stale, possibly-obsolete, unclassified. The
-   counts must add up to the total.
+   counts must add up to the number of pull requests in the snapshot.
 3. `## Top reasons` with a count per driving tag and per actionable informational tag
    (`ci-failing`, `merge-conflict`, `no-reviewers`, `large-diff`, `aging`).
 4. One `## <status>` section per non-empty status, in the summary order. Each is a table with the

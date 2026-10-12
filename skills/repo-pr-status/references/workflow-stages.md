@@ -57,15 +57,17 @@ operations, never a `mutation`; passing `-f`/`-F` to it is the normal way to sen
 `query` and its variables.
 
 1. The repository and default branch were already resolved at start; reuse them.
-2. List open pull requests:
+2. Count open pull requests with one read-only GraphQL `query`, before the list call:
+   `gh api graphql -f owner=<owner> -f name=<name> -f query='query($owner:String!,$name:String!){repository(owner:$owner,name:$name){pullRequests(states:OPEN){totalCount}}}'`.
+   Record the result as `openPrTotal`. Then list open pull requests:
    `gh pr list --repo <nameWithOwner> --state open --limit <maxPullRequests> --json number,title,url,author,isDraft,createdAt,updatedAt,baseRefName,headRefName,isCrossRepository,labels,reviewDecision,reviewRequests,additions,deletions,changedFiles`.
-   Set `truncated` when the result reaches `maxPullRequests`.
+   Set `truncated` when `openPrTotal` exceeds the number of listed pull requests.
 3. For each pull request:
    `gh pr view <number> --repo <nameWithOwner> --json commits,statusCheckRollup,mergeable,mergeStateStatus,headRepository,body`
 4. For each pull request, one `gh api graphql` `query`:
 
    ```sh
-   gh api graphql -f owner=<owner> -f name=<name> -F number=<n> -f query='query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){baseRef{name} closingIssuesReferences(first:20){totalCount nodes{number state}} comments(last:20){nodes{author{login __typename} createdAt body}} reviews(last:20){nodes{author{login __typename} state submittedAt body}} latestReviews(first:100){nodes{author{login __typename} state submittedAt}} reviewThreads(first:100){totalCount nodes{isResolved comments(last:1){nodes{author{login __typename} createdAt}}}}}}}'
+   gh api graphql -f owner=<owner> -f name=<name> -F number=<n> -f query='query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){baseRef{name} closingIssuesReferences(first:20){totalCount nodes{number state}} comments(last:20){totalCount nodes{author{login __typename} createdAt body}} reviews(last:20){totalCount nodes{author{login __typename} state submittedAt body}} latestReviews(first:100){nodes{author{login __typename} state submittedAt}} reviewThreads(first:100){totalCount nodes{isResolved comments(last:20){totalCount nodes{author{login __typename} createdAt}}}}}}}'
    ```
 
    A null `baseRef` means the base branch is missing. Comments, reviews, and review threads come
@@ -78,7 +80,8 @@ the UTC time collection started.
 
 If a call for one pull request fails, record the pull request number and error in `errors[]` and
 continue; the Analyst marks it `unclassified`. Stop at `collection_blocked` only when `gh auth
-status`, the explicit repository lookup, or the list call fails. Set stage `classifying`.
+status`, the explicit repository lookup, the open pull request count query, or the list call
+fails. Set stage `classifying`.
 
 ## Classifying
 

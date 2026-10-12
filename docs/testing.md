@@ -199,7 +199,9 @@ the output must be identical.
 | Context is not a single GitHub repository | `repo-pr-status` asks for the target `owner/name` instead of guessing |
 | Unauthenticated `gh` for `repo-pr-status` | Stops at `collection_blocked` |
 | `repo-pr-status` run | Writes `snapshot.json`, `config.json`, `rules.md`, and `report.md`, stops at `reported`, and makes no mutating `gh` call |
-| Summary counts | Add up to the open pull request count |
+| Summary counts | Add up to the snapshot PR count, which equals `openPrTotal` unless truncated |
+| Exactly `maxPullRequests` open PRs | Not truncated |
+| More than `maxPullRequests` open PRs | Truncated, header shows true total |
 | Draft PR | `draft` with bold `draft` |
 | PR labeled `blocked` | `blocked` with bold `blocked-label` |
 | Change requested, no push since | `waiting-on-author` with bold `changes-requested` |

@@ -29,6 +29,7 @@ such as `report-2.md`, and updates `currentReport`. The snapshot is never re-col
   "snapshotAt": "2026-01-01T00:00:00Z",
   "repo": "example/example",
   "defaultBranch": "main",
+  "openPrTotal": 0,
   "truncated": false,
   "prs": [],
   "errors": [{"number": 42, "error": "short error summary"}]
@@ -40,10 +41,12 @@ Each entry in `prs` holds only the fields named by the collection commands in th
 - the `gh pr list` and `gh pr view` JSON fields
 - `baseRef` from the GraphQL query; null means the base branch is missing
 - `closingIssuesReferences` with `totalCount` and `nodes[{number,state}]`
-- `comments`, `reviews`, and `latestReviews` from the GraphQL query, each flattened from `nodes`
-  to a list whose `author` keeps `login` and `__typename`
-- `reviewThreads` with `totalCount` and `nodes[{isResolved,comments}]`, whose comment authors keep
+- `comments` and `reviews` from the GraphQL query, each with `totalCount` and `nodes`, whose
+  `author` keeps `login` and `__typename`
+- `latestReviews` from the GraphQL query, flattened from `nodes` to a list whose `author` keeps
   `login` and `__typename`
+- `reviewThreads` with `totalCount` and `nodes[{isResolved,comments}]`, where each thread's
+  `comments` keeps `totalCount` and `nodes`, and comment authors keep `login` and `__typename`
 
 A key that is present with a null value is data, not a gap.
 
@@ -59,6 +62,7 @@ Create state with this minimum shape and preserve unknown fields whenever it is 
   "stage": "intake",
   "snapshotAt": null,
   "prCount": 0,
+  "openPrTotal": 0,
   "truncated": false,
   "currentReport": null,
   "createdAt": "2026-01-01T00:00:00Z",

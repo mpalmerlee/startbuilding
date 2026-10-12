@@ -21,7 +21,10 @@ All notable changes to StartBuilding are documented in this file.
   (`awaiting-ci`) or on branch protection (`blocked-by-protection`), and unanswered reviewer
   comments drive `waiting-on-author`. Base-branch state, linked-issue state, comments, reviews,
   and review threads come from one read-only GraphQL `query` per pull request, which identifies
-  bot authors by `__typename` so bot comments never count as reviewer feedback.
+  bot authors by `__typename` so bot comments never count as reviewer feedback. One more read-only
+  GraphQL `query` counts all open pull requests, so the report shows the true total and marks the
+  snapshot truncated only when that total exceeds the listed pull requests. Comment, review, and
+  thread-reply history beyond the fetched window is noted under Data gaps.
 - Added new shared agents: `startbuilding-repo-pr-status-coordinator` and
   `startbuilding-repo-pr-status-analyst`. The Analyst has no shell, edit, or network access.
 - Extended `scripts/validate.py` to validate the new skill graph, its agents and configuration
