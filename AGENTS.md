@@ -6,9 +6,9 @@ Code. Keep changes portable across all three clients.
 ## Source contracts
 
 - `skills/deliver/` is the shared workflow and artifact contract.
-- `skills/research/`, `skills/pr-review/`, and `skills/pr-resolve/` are independent, isolated
-  workflow and artifact contracts. Never let one graph's Coordinator delegate to another graph's
-  agents.
+- `skills/research/`, `skills/pr-review/`, `skills/pr-resolve/`, and `skills/repo-pr-status/` are
+  independent, isolated workflow and artifact contracts. Never let one graph's Coordinator delegate
+  to another graph's agents.
 - `agents/` contains the shared `.agent.md` definitions used by every supported client.
 - Shared agent tool allowlists include both Copilot aliases and Claude-native names. Preserve each
   role's effective least-privilege boundary in both clients.
@@ -25,6 +25,8 @@ Code. Keep changes portable across all three clients.
 - Keep `pr-review` findings approval and `pr-resolve` plan approval separate turns from any
   mutating `gh` call. Never let a mutating role submit a review `APPROVE`/`REQUEST_CHANGES` event,
   merge, close, or edit a pull request's title, description, or labels.
+- Keep `repo-pr-status` read-only with respect to GitHub: no mutating `gh` call, REST `gh api` only
+  with `-X GET`, and GraphQL only `query` operations.
 - Do not add hooks, MCP/LSP servers, compiled extension code, or runtime services without an
   approved architecture change and cross-client security review.
 - Use ASCII text, repository-relative paths, and concise comments.

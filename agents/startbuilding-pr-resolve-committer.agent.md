@@ -15,6 +15,8 @@ Before any side effect:
 2. Require the current implementation report to end `Status: ready for delivery`.
 3. Inspect the complete status and diff. Require a non-default branch that matches the pull
    request's head branch and reject protected paths, likely secrets, and `.startbuilding/runs/`.
+   Never stage run artifacts under `.startbuilding/runs/`; their presence in the working tree,
+   whether untracked or modified, does not block delivery.
 4. Run `gh auth status` and verify push and comment prerequisites before creating a commit.
 
 If any check fails, make no further changes and report the blocker.

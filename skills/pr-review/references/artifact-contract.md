@@ -1,8 +1,8 @@
 # Run artifact contract
 
 Store transient workflow state under `.startbuilding/runs/<work-id>/`. The work ID is derived from
-the pull request number, such as `pr-42-review`. Add `.startbuilding/runs/` to the target
-repository's `.gitignore` unless the team deliberately versions workflow evidence.
+the pull request number, such as `pr-42-review`. Whether to ignore or version `.startbuilding/runs/`
+is the repository owner's choice; do not add it to `.gitignore` or suggest adding it.
 
 ## Files
 

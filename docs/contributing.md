@@ -12,7 +12,7 @@ The plugin itself has no Python or Node.js runtime dependency.
 ## Make a change
 
 1. Read `AGENTS.md` and the relevant contract under `skills/deliver/`, `skills/research/`,
-   `skills/pr-review/`, or `skills/pr-resolve/`.
+   `skills/pr-review/`, `skills/pr-resolve/`, or `skills/repo-pr-status/`.
 2. Keep the shared skill host-neutral.
 3. When changing a specialist, update both native agent files and preserve equivalent behavior.
 4. Keep frontmatter restricted to fields supported by that client.

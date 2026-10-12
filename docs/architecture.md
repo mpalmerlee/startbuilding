@@ -7,7 +7,8 @@ model execution and tools, the target repository supplies architecture and valid
 supplies isolation and source history, and local files supply resumable workflow state. The
 `deliver` graph applies this framework to software changes; the `research` graph applies it to
 investigation and recommendation; the `pr-review` and `pr-resolve` graphs apply it to an already
-open pull request, using `gh` as the interface to GitHub.
+open pull request, using `gh` as the interface to GitHub; the `repo-pr-status` graph applies it to a
+read-only status report of every open pull request in a repository.
 
 StartBuilding does not provide a queue, background worker, database, scheduler, multi-user approval
 system, remote execution service, or project-management UI.
@@ -23,6 +24,7 @@ skills/deliver/                     Shared workflow and artifact contract
 skills/research/                    Shared research workflow and artifact contract
 skills/pr-review/                   Shared PR review workflow and artifact contract
 skills/pr-resolve/                  Shared PR feedback resolution workflow and artifact contract
+skills/repo-pr-status/              Shared repository PR status workflow, rules, and artifact contract
 agents/                             Shared cross-client agent definitions
 scripts/validate.sh                 Static validation entry point
 ```
@@ -118,6 +120,30 @@ following the same isolation principle as the research graph: each Coordinator's
 names only its own graph's specialists, so a mutating role from one graph can never be invoked as a
 delegate of another.
 
+## Repo PR status components
+
+The `repo-pr-status` skill is a fifth, independent graph. It targets the GitHub repository of the
+current working directory or a user-named `owner/name`, asks for `owner/name` when the context is
+not a single repository, and reports on every open pull request without changing anything on GitHub.
+
+| Role | Responsibility | Copilot tools | Claude tools |
+| --- | --- | --- | --- |
+| Repo PR Status Coordinator | State, delegation, and read-only `gh` collection | read, search, edit, execute, agent | Read, Glob, Grep, Write, Edit, Bash, Agent allowlist |
+| Analyst | Applies the status and tag rules to the persisted snapshot and writes the report | read, search | Read, Glob, Grep |
+
+Only the Coordinator has `execute`. A separate collector agent with `Bash` would add no
+least-privilege benefit, since neither client can restrict `Bash` to read-only `gh` subcommands and
+the Coordinator already has unrestricted `Bash`. The Analyst reads untrusted pull request text, so
+it has no shell, edit, or network access and reads only the persisted `snapshot.json`,
+`config.json`, and `rules.md`. The rules are applied by the model rather than shipped code; copying
+the rules and resolved thresholds into the run and using the snapshot time as "now" keep runs
+reproducible.
+
+This graph has no human gate, because nothing is mutated: it stops at `reported`. Read-only GitHub
+access is an instruction for the Coordinator, which names every forbidden `gh` form, would use
+REST `gh api` only with an explicit `-X GET` (none is used), and sends GraphQL only as `query`
+operations with variables.
+
 ## State machine
 
 ```text
@@ -181,6 +207,19 @@ The transition out of `plan_review` requires explicit human approval of the curr
 the same way as `deliver`'s plan approval. There is no independent-review stage: implementation
 transitions directly to delivery, which both delivers the approved changes and replies to the
 pull request's comments.
+
+The `repo-pr-status` graph uses its own, independent state machine:
+
+```text
+intake
+  -> collecting
+  -> classifying
+  -> reported | collection_blocked
+reported -> classifying (explicit reclassify request)
+```
+
+There is no approval gate. A reclassify request reuses the same snapshot with changed thresholds and
+writes a suffixed report; fresh data always means a new run.
 
 ## Delivery scope
 
@@ -248,7 +287,9 @@ those same tools are also enough to edit source, commit, push, or post PR commen
 mutating actions that are supposed to belong only to a delegated specialist. "Own only
 orchestration... never perform specialist work" (see each Coordinator's instructions) is an
 enforced boundary for every *specialist* role, whose own tool list has no `Bash`/`Edit`/`Write` to
-misuse, but for the Coordinator itself it is a prose instruction, not a tool restriction.
+misuse, but for the Coordinator itself it is a prose instruction, not a tool restriction. The
+same applies to the `repo-pr-status` Coordinator, whose read-only GitHub access is an instruction
+rather than a tool restriction.
 
 A real fix would mean either giving the Coordinator a narrower, artifact-only write mechanism plus
 a read-only-shaped `Bash` for precondition checks (so it has no path to source edits or mutating
