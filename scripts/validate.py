@@ -54,6 +54,9 @@ SKILLS = {
     },
 }
 
+NAMING_RULE_MARKER = "Never substitute a generic agent or a differently"
+STALE_NAMING_TABLE = "| VS Code and Copilot | Claude Code |"
+
 GRAPHS = {
     "deliver": {
         "roles": ("coordinator", "planner", "implementer", "reviewer", "committer"),
@@ -244,6 +247,14 @@ class Validation:
             for marker in spec["markers"]:
                 if marker not in body:
                     self.fail(f"Skill {skill_name} is missing contract marker: {marker}")
+            # Specialist naming rule: every specialist listed, one rule, no per-client table.
+            for role in GRAPHS[skill_name]["roles"][1:]:
+                if f"startbuilding-{role}" not in body:
+                    self.fail(f"Skill {skill_name} is missing specialist startbuilding-{role}")
+            if NAMING_RULE_MARKER not in body:
+                self.fail(f"Skill {skill_name} is missing the specialist naming rule")
+            if STALE_NAMING_TABLE in body:
+                self.fail(f"Skill {skill_name} still uses the per-client specialist table")
 
         config = self.read_json("skills/deliver/assets/project.json")
         if config.get("version") != 1:

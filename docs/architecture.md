@@ -48,8 +48,12 @@ artifacts, selects the next state transition, and invokes one specialist at a ti
 | Committer | Staging, commit, push, and PR | read, execute | Read, Glob, Grep, Bash |
 
 The Coordinator is also available as an explicit agent entry point. Specialists are hidden from the
-normal Copilot picker but remain model-invocable. Claude plugin agents use scoped display names such
-as `startbuilding:startbuilding-implementer`.
+normal Copilot picker but remain model-invocable. Hosts register plugin agents under different
+names. VS Code Local uses the bare name, such as `startbuilding-implementer`. Claude Code, Copilot
+CLI, and the VS Code Copilot harness use the plugin-scoped name, such as
+`startbuilding:startbuilding-implementer`. Each skill resolves its specialists with one rule: use
+the scoped form when the delegation tool lists it, otherwise the exact bare name, and otherwise stop
+with a blocker.
 
 ## Research components
 

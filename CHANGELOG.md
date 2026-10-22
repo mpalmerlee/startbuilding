@@ -2,6 +2,21 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.6.1 - 2026-10-22
+
+### Fixed
+
+- Skills now resolve specialist agents with one rule in every client: the plugin-scoped
+  `startbuilding:<name>` when the delegation tool lists it, otherwise the exact bare name, never a
+  generic or differently named agent. This fixes Copilot CLI and VS Code Copilot harness runs that
+  stopped because the specialist was reported as unavailable.
+
+### Changed
+
+- Added agent-name delegation checks for the VS Code Copilot and Local harnesses and for Copilot
+  CLI to the release test, and made the repository validator check the specialist naming rule in
+  every skill.
+
 ## 0.6.0 - 2026-10-12
 
 ### Added

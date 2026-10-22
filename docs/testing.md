@@ -11,9 +11,9 @@ claude plugin validate . --strict
 
 The repository validator checks manifest identity and version parity, component paths, skill links,
 project policy, the shared agent inventory, dual-vocabulary tool restrictions, coordinator
-allowlists, stale identifiers, ASCII text, trailing whitespace, and executable permissions. It
-excludes `.startbuilding/runs/`, since that tree holds transient, gitignored workflow evidence
-rather than shipped plugin content.
+allowlists, the specialist naming rule, stale identifiers, ASCII text, trailing whitespace, and
+executable permissions. It excludes `.startbuilding/runs/`, since that tree holds transient,
+gitignored workflow evidence rather than shipped plugin content.
 
 ## Prevent customization collisions
 
@@ -40,21 +40,29 @@ project file.
 5. Invoke the Planner as a subagent and confirm it receives workspace read and file-search tools.
 6. Invoke the Implementer as a subagent and confirm it receives filesystem, edit, and shell tools.
 7. Confirm `/startbuilding:deliver` appears and the Coordinator can invoke each exact specialist.
-8. Confirm `/startbuilding:research` appears and the Research Coordinator can invoke the
+8. In the Copilot harness, ask the main agent to list the exact agent names its delegation tool
+   accepts. Confirm every StartBuilding specialist appears as `startbuilding:startbuilding-<name>`.
+   Run `/startbuilding:research <trivial question>`. Confirm it delegates to
+   `startbuilding:startbuilding-researcher`. It must not stop with a specialist-unavailable blocker,
+   use a built-in agent such as `research` or general-purpose, or do the work inline. Then delegate
+   to `startbuilding:startbuilding-planner` and ask it to run `echo hi` and create a file. Confirm
+   both fail. Repeat in the Local harness and confirm delegation uses the bare
+   `startbuilding-researcher`.
+9. Confirm `/startbuilding:research` appears and the Research Coordinator can invoke the
    Researcher, Skeptic, and Merger. Confirm the Merger receives only workspace read and
    file-search tools, and that the Researcher and Skeptic receive those plus web fetch, with no
    edit or shell tools for any of the three.
-9. Confirm `/startbuilding:pr-review` appears and the PR Review Coordinator can invoke the
-   Reviewer and Commenter. Confirm the Reviewer receives only workspace read and file-search
-   tools, with no shell access at all, and that only the Commenter receives shell access (for
-   `gh`), restricted by its own instructions to a `COMMENT`-event review.
-10. Confirm `/startbuilding:pr-resolve` appears and the PR Resolve Coordinator can invoke the
+10. Confirm `/startbuilding:pr-review` appears and the PR Review Coordinator can invoke the
+    Reviewer and Commenter. Confirm the Reviewer receives only workspace read and file-search
+    tools, with no shell access at all, and that only the Commenter receives shell access (for
+    `gh`), restricted by its own instructions to a `COMMENT`-event review.
+11. Confirm `/startbuilding:pr-resolve` appears and the PR Resolve Coordinator can invoke the
     Planner, Implementer, and Committer, mirroring the `deliver` tool boundaries with no
     independent-review role.
-11. Confirm `/startbuilding:repo-pr-status` appears and the Repo PR Status Coordinator can invoke
+12. Confirm `/startbuilding:repo-pr-status` appears and the Repo PR Status Coordinator can invoke
     only the Analyst. Confirm the Analyst receives only workspace read and file-search tools, with
     no shell, edit, or web access.
-12. Disable the plugin and confirm its components disappear; enable it and confirm they return.
+13. Disable the plugin and confirm its components disappear; enable it and confirm they return.
 
 ## Copilot CLI local test
 
@@ -64,8 +72,12 @@ Load the working tree for one session without changing persistent configuration:
 copilot --plugin-dir /absolute/path/to/startbuilding plugin list
 ```
 
-Confirm the output lists `startbuilding` under external plugins. After the repository is public,
-exercise persistent lifecycle commands:
+Confirm the output lists `startbuilding` under external plugins.
+
+In a `copilot --plugin-dir` session, run `/startbuilding:research <trivial question>` and confirm it
+delegates to `startbuilding:startbuilding-researcher` without a 'No such agent' error.
+
+After the repository is public, exercise persistent lifecycle commands:
 
 ```sh
 copilot plugin install mpalmerlee/startbuilding
