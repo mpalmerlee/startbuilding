@@ -21,13 +21,24 @@ Read the references when their subject becomes relevant:
 
 ## Specialist agents
 
-Use the exact native specialist supplied by this plugin. Never substitute a generic agent when a
-named specialist is missing.
+Each specialist is a native agent supplied by this plugin, named exactly as listed below. Look up
+that exact name in the agent names your delegation tool accepts:
 
-| Role | VS Code and Copilot | Claude Code |
-| --- | --- | --- |
-| Reviewer | `startbuilding-pr-reviewer` | `startbuilding:startbuilding-pr-reviewer` |
-| Commenter | `startbuilding-pr-commenter` | `startbuilding:startbuilding-pr-commenter` |
+- If it lists `startbuilding:` followed by the exact name, such as
+  `startbuilding:startbuilding-pr-reviewer`, use that prefixed form.
+- Otherwise, if it lists no agent name that starts with `startbuilding:`, and it lists the exact
+  name, such as `startbuilding-pr-reviewer`, use it.
+- Otherwise, the specialist is unavailable. Stop with a concrete blocker that lists the agent
+  names you found.
+
+Match the whole name, never a part of it. Never substitute a generic agent or a differently
+named agent, including a built-in agent such as `research`, `plan`, or `code-review`, or a
+specialist of another StartBuilding skill.
+
+| Role | Agent name |
+| --- | --- |
+| Reviewer | `startbuilding-pr-reviewer` |
+| Commenter | `startbuilding-pr-commenter` |
 
 The parent context owns orchestration and writes only workflow artifacts. Persist each specialist's
 returned report exactly before changing `state.json`. The parent must not perform specialist work

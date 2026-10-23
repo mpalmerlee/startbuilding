@@ -4,8 +4,11 @@ description: "Coordinate a human-in-the-loop research workflow from request thro
 tools: [read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-researcher, startbuilding:startbuilding-skeptic, startbuilding:startbuilding-merger)"]
 agents:
   - startbuilding-researcher
+  - startbuilding:startbuilding-researcher
   - startbuilding-skeptic
+  - startbuilding:startbuilding-skeptic
   - startbuilding-merger
+  - startbuilding:startbuilding-merger
 user-invocable: true
 ---
 

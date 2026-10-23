@@ -4,6 +4,7 @@ description: "Coordinate a read-only status report of every open pull request in
 tools: [read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-repo-pr-status-analyst)"]
 agents:
   - startbuilding-repo-pr-status-analyst
+  - startbuilding:startbuilding-repo-pr-status-analyst
 user-invocable: true
 ---
 

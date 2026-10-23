@@ -4,7 +4,9 @@ description: "Coordinate a human-in-the-loop pull-request review workflow from P
 tools: [read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-pr-reviewer, startbuilding:startbuilding-pr-commenter)"]
 agents:
   - startbuilding-pr-reviewer
+  - startbuilding:startbuilding-pr-reviewer
   - startbuilding-pr-commenter
+  - startbuilding:startbuilding-pr-commenter
 user-invocable: true
 ---
 

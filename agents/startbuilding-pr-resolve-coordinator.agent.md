@@ -4,8 +4,11 @@ description: "Coordinate a human-in-the-loop pull-request feedback resolution wo
 tools: [read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-pr-resolve-planner, startbuilding:startbuilding-pr-resolve-implementer, startbuilding:startbuilding-pr-resolve-committer)"]
 agents:
   - startbuilding-pr-resolve-planner
+  - startbuilding:startbuilding-pr-resolve-planner
   - startbuilding-pr-resolve-implementer
+  - startbuilding:startbuilding-pr-resolve-implementer
   - startbuilding-pr-resolve-committer
+  - startbuilding:startbuilding-pr-resolve-committer
 user-invocable: true
 ---
 
