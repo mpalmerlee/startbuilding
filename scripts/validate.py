@@ -54,7 +54,13 @@ SKILLS = {
     },
 }
 
-NAMING_RULE_MARKER = "Never substitute a generic agent or a differently"
+# Specialist naming rule clauses, in the order they must appear (whitespace-normalized).
+NAMING_RULE_MARKERS = (
+    "use that prefixed form.",
+    "lists no agent name that starts with `startbuilding:`, and it lists the exact name",
+    "Stop with a concrete blocker that lists the agent names you found.",
+    "Never substitute a generic agent or a differently named agent",
+)
 STALE_NAMING_TABLE = "| VS Code and Copilot | Claude Code |"
 
 GRAPHS = {
@@ -247,12 +253,20 @@ class Validation:
             for marker in spec["markers"]:
                 if marker not in body:
                     self.fail(f"Skill {skill_name} is missing contract marker: {marker}")
-            # Specialist naming rule: every specialist listed, one rule, no per-client table.
+            # Specialist naming rule: every specialist in the table, one ordered rule, no
+            # per-client table.
             for role in GRAPHS[skill_name]["roles"][1:]:
-                if f"startbuilding-{role}" not in body:
-                    self.fail(f"Skill {skill_name} is missing specialist startbuilding-{role}")
-            if NAMING_RULE_MARKER not in body:
-                self.fail(f"Skill {skill_name} is missing the specialist naming rule")
+                if f"| `startbuilding-{role}` |" not in body:
+                    self.fail(f"Skill {skill_name} is missing table row for startbuilding-{role}")
+            flat = " ".join(body.split())
+            positions = []
+            for marker in NAMING_RULE_MARKERS:
+                position = flat.find(marker)
+                if position < 0:
+                    self.fail(f"Skill {skill_name} is missing naming rule clause: {marker}")
+                positions.append(position)
+            if all(p >= 0 for p in positions) and positions != sorted(set(positions)):
+                self.fail(f"Skill {skill_name} has naming rule clauses out of order")
             if STALE_NAMING_TABLE in body:
                 self.fail(f"Skill {skill_name} still uses the per-client specialist table")
 
@@ -309,6 +323,23 @@ class Validation:
             for role in roles[1:]:
                 if agent_names[role] not in coordinator_text:
                     self.fail(f"Shared {coordinator_role} is missing {agent_names[role]}")
+
+            # Coordinator agents: list names both forms of only its own specialists.
+            expected_agents = set()
+            for role in roles[1:]:
+                expected_agents.update({agent_names[role], f"startbuilding:{agent_names[role]}"})
+            frontmatter = re.match(r"\A---\n(.*?\n)---\n", coordinator_text, re.DOTALL)
+            agents_block = re.search(
+                r"^agents:\n((?:  - .*\n)+)", frontmatter.group(1) if frontmatter else "", re.M
+            )
+            listed_agents = set()
+            if agents_block:
+                for line in agents_block.group(1).splitlines():
+                    listed_agents.add(line.strip()[2:].strip().strip('"').strip("'"))
+            for name in sorted(expected_agents - listed_agents):
+                self.fail(f"Shared {coordinator_role} agents: list is missing {name}")
+            for name in sorted(listed_agents - expected_agents):
+                self.fail(f"Shared {coordinator_role} agents: list has unexpected {name}")
 
             for role, markers in graph["contract_markers"].items():
                 role_path = self.require_file(f"agents/startbuilding-{role}.agent.md")

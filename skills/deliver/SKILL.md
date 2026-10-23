@@ -30,7 +30,8 @@ that exact name in the agent names your delegation tool accepts:
 
 - If it lists `startbuilding:` followed by the exact name, such as
   `startbuilding:startbuilding-planner`, use that prefixed form.
-- Otherwise, if it lists the exact name, such as `startbuilding-planner`, use it.
+- Otherwise, if it lists no agent name that starts with `startbuilding:`, and it lists the exact
+  name, such as `startbuilding-planner`, use it.
 - Otherwise, the specialist is unavailable. Stop with a concrete blocker that lists the agent
   names you found.
 
