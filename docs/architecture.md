@@ -52,8 +52,10 @@ normal Copilot picker but remain model-invocable. Hosts register plugin agents u
 names. VS Code Local uses the bare name, such as `startbuilding-implementer`. Claude Code, Copilot
 CLI, and the VS Code Copilot harness use the plugin-scoped name, such as
 `startbuilding:startbuilding-implementer`. Each skill resolves its specialists with one rule: use
-the scoped form when the delegation tool lists it, otherwise the exact bare name, and otherwise stop
-with a blocker.
+the scoped form when the delegation tool lists it; otherwise, only when the tool lists no
+`startbuilding:`-scoped agent, the exact bare name; otherwise stop with a blocker. Each
+Coordinator's `agents:` list names both forms of only its own specialists, so whichever form a host
+matches, the Coordinator reaches only its own graph.
 
 ## Research components
 

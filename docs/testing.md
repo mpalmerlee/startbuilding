@@ -46,23 +46,31 @@ project file.
    `startbuilding:startbuilding-researcher`. It must not stop with a specialist-unavailable blocker,
    use a built-in agent such as `research` or general-purpose, or do the work inline. Then delegate
    to `startbuilding:startbuilding-planner` and ask it to run `echo hi` and create a file. Confirm
-   both fail. Repeat in the Local harness and confirm delegation uses the bare
-   `startbuilding-researcher`.
-9. Confirm `/startbuilding:research` appears and the Research Coordinator can invoke the
-   Researcher, Skeptic, and Merger. Confirm the Merger receives only workspace read and
-   file-search tools, and that the Researcher and Skeptic receive those plus web fetch, with no
-   edit or shell tools for any of the three.
-10. Confirm `/startbuilding:pr-review` appears and the PR Review Coordinator can invoke the
+   both fail. Repeat all of step 8 in the Local harness, including the Planner `echo hi` and
+   file-creation denial checks, and confirm delegation uses the bare `startbuilding-researcher`
+   and `startbuilding-planner`.
+9. In the Copilot harness, select each of the five StartBuilding Coordinator agents directly as
+   the chat agent. Ask each one to delegate a trivial read-only task to one of its own specialists
+   and confirm the delegation succeeds with no specialist-unavailable blocker. Then ask it to
+   delegate to a specialist of another graph, such as the delivery Coordinator to
+   `startbuilding-pr-commenter`, and to a built-in agent, and confirm both are refused. Repeat in
+   the Local harness. If the Customizations view reports diagnostics for the scoped `agents:`
+   entries, record that, because it fails step 3.
+10. Confirm `/startbuilding:research` appears and the Research Coordinator can invoke the
+    Researcher, Skeptic, and Merger. Confirm the Merger receives only workspace read and
+    file-search tools, and that the Researcher and Skeptic receive those plus web fetch, with no
+    edit or shell tools for any of the three.
+11. Confirm `/startbuilding:pr-review` appears and the PR Review Coordinator can invoke the
     Reviewer and Commenter. Confirm the Reviewer receives only workspace read and file-search
     tools, with no shell access at all, and that only the Commenter receives shell access (for
     `gh`), restricted by its own instructions to a `COMMENT`-event review.
-11. Confirm `/startbuilding:pr-resolve` appears and the PR Resolve Coordinator can invoke the
+12. Confirm `/startbuilding:pr-resolve` appears and the PR Resolve Coordinator can invoke the
     Planner, Implementer, and Committer, mirroring the `deliver` tool boundaries with no
     independent-review role.
-12. Confirm `/startbuilding:repo-pr-status` appears and the Repo PR Status Coordinator can invoke
+13. Confirm `/startbuilding:repo-pr-status` appears and the Repo PR Status Coordinator can invoke
     only the Analyst. Confirm the Analyst receives only workspace read and file-search tools, with
     no shell, edit, or web access.
-13. Disable the plugin and confirm its components disappear; enable it and confirm they return.
+14. Disable the plugin and confirm its components disappear; enable it and confirm they return.
 
 ## Copilot CLI local test
 
@@ -75,7 +83,10 @@ copilot --plugin-dir /absolute/path/to/startbuilding plugin list
 Confirm the output lists `startbuilding` under external plugins.
 
 In a `copilot --plugin-dir` session, run `/startbuilding:research <trivial question>` and confirm it
-delegates to `startbuilding:startbuilding-researcher` without a 'No such agent' error.
+delegates to `startbuilding:startbuilding-researcher` without a 'No such agent' error. Then
+delegate to `startbuilding:startbuilding-planner`, ask it to run `echo hi` and create a file, and
+confirm both fail. Repeat with `startbuilding:startbuilding-pr-reviewer`, a shell-less role from
+another graph, and confirm both fail.
 
 After the repository is public, exercise persistent lifecycle commands:
 
