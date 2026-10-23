@@ -4,9 +4,13 @@ description: "Coordinate a human-in-the-loop delivery workflow from request thro
 tools: [read, search, edit, execute, agent, Read, ToolSearch, Glob, Grep, Write, Edit, Bash, "Agent(startbuilding:startbuilding-planner, startbuilding:startbuilding-implementer, startbuilding:startbuilding-reviewer, startbuilding:startbuilding-committer)"]
 agents:
   - startbuilding-planner
+  - startbuilding:startbuilding-planner
   - startbuilding-implementer
+  - startbuilding:startbuilding-implementer
   - startbuilding-reviewer
+  - startbuilding:startbuilding-reviewer
   - startbuilding-committer
+  - startbuilding:startbuilding-committer
 user-invocable: true
 ---
 
