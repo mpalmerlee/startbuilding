@@ -2,6 +2,20 @@
 
 All notable changes to StartBuilding are documented in this file.
 
+## 0.6.2 - 2026-11-02
+
+### Fixed
+
+- `pr-resolve` and `pr-review` can start a new run on a pull request that already has a completed
+  run. The new run uses the next free numeric suffix, such as `pr-42-resolve-2`, instead of
+  stopping because the workflow defined no collision-safe path. `deliver` and `research` now
+  follow the same rule when a chosen work ID already exists. No new run reuses or overwrites an
+  existing run directory.
+
+### Changed
+
+- Added a release test row for a repeated `pr-review` or `pr-resolve` run on the same pull request.
+
 ## 0.6.1 - 2026-10-22
 
 ### Fixed

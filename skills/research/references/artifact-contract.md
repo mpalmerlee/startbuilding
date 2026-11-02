@@ -1,8 +1,10 @@
 # Run artifact contract
 
 Store transient workflow state under `.startbuilding/runs/<work-id>/`. The work ID must be a short,
-lowercase, hyphenated identifier. Whether to ignore or version `.startbuilding/runs/` is the
-repository owner's choice; do not add it to `.gitignore` or suggest adding it.
+lowercase, hyphenated identifier. A new run never reuses an existing run directory: if the chosen
+work ID already exists, append the next free numeric suffix, such as `-2`, then `-3`, and so on.
+Whether to ignore or version `.startbuilding/runs/` is the repository owner's choice; do not add it
+to `.gitignore` or suggest adding it.
 
 ## Files
 

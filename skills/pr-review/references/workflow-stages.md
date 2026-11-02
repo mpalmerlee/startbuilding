@@ -17,7 +17,10 @@ Update `state.json` only after the corresponding artifact has been written succe
 3. Run `gh pr view --json number,url,state,headRefName,baseRefName,title,body,isDraft` for the
    current branch. Stop if there is no open pull request for this branch; never search for or
    guess a different PR.
-4. Derive the work ID from the pull request number, such as `pr-42-review`.
+4. For a new run, derive the work ID from the pull request number, such as `pr-42-review`. If
+   that run directory already exists, such as from a completed earlier run on the same pull
+   request, append the next free numeric suffix, such as `pr-42-review-2`, then `-3`, and so
+   on. Never reuse or overwrite an existing run directory for a new run.
 5. For a new request, create the run directory, `request.md`, and initial `state.json` with stage
    `intake`.
 6. For a resumed request, validate the state shape and current artifact pointers before choosing a
