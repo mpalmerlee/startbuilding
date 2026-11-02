@@ -116,7 +116,8 @@ StartBuilding stops at `findings_review` and asks which findings to post. Before
 re-checks the pull request's head commit against the one the findings were produced against, and
 blocks instead of posting against a diff that has since moved.
 
-Each run is stored locally under a work ID derived from the pull request number:
+Each run is stored locally under a work ID derived from the pull request number. A later run on
+the same pull request gets the next free numeric suffix, such as `pr-<number>-review-2`:
 
 ```text
 .startbuilding/runs/pr-<number>-review/
@@ -153,7 +154,8 @@ intake -> cataloging -> plan_review -> implementation
 StartBuilding stops at `plan_review` and asks you to approve the catalog and plan. There is no
 independent-review stage here: implementation goes directly to delivery once you approve.
 
-Each run is stored locally under a work ID derived from the pull request number:
+Each run is stored locally under a work ID derived from the pull request number. A later run on
+the same pull request gets the next free numeric suffix, such as `pr-<number>-resolve-2`:
 
 ```text
 .startbuilding/runs/pr-<number>-resolve/

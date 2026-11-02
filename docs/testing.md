@@ -212,6 +212,7 @@ the output must be identical.
 | PR head moved before posting | Posting blocks instead of anchoring to a stale diff position |
 | Explicit findings approval | Posts one `COMMENT`-event review with correctly anchored inline comments |
 | New `pr-resolve` request | Derives the work ID from the PR number and catalogs every comment |
+| New `pr-review` or `pr-resolve` request after a completed run on the same PR | Starts a new run under the next free suffixed work ID, such as `pr-42-resolve-2`, without touching the earlier run |
 | Comment catalog | Numbers every review-thread and issue comment and assigns each a recommendation |
 | No plan approval | `pr-resolve` Implementer refuses without edits |
 | Explicit plan approval | Implements only the "fix now" items from the approved plan |

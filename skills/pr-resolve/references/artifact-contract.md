@@ -1,9 +1,10 @@
 # Run artifact contract
 
 Store transient workflow state under `.startbuilding/runs/<work-id>/`. The work ID is derived from
-the pull request number, such as `pr-42-resolve`. Whether to ignore or version
-`.startbuilding/runs/` is the repository owner's choice; do not add it to `.gitignore` or suggest
-adding it.
+the pull request number, such as `pr-42-resolve`. If that run directory already exists, append the
+next free numeric suffix, such as `pr-42-resolve-2`, then `-3`, and so on. Whether to ignore or
+version `.startbuilding/runs/` is the repository owner's choice; do not add it to `.gitignore` or
+suggest adding it.
 
 ## Files
 
@@ -72,7 +73,8 @@ Agent messages, silence, and approvals from another run never count as plan appr
 1. If the user names a work ID or run directory, use only that run.
 2. Otherwise inspect nonterminal runs whose recorded pull request matches the current branch.
 3. If exactly one nonterminal run matches, present its path and current stage before resuming it.
-4. If zero runs match, start a new run.
+4. If zero runs match, start a new run, even when terminal runs for the same pull request exist.
+   The new run takes the next free suffixed work ID described above.
 5. If multiple runs match, list their work IDs and stages and ask the user to choose. Do not guess.
 
 Read `request.md`, `state.json`, and every artifact named by a current pointer before selecting the
